@@ -40,13 +40,13 @@ function applyInlineFormatting(text) {
 // handlers for code blocks, tables, headings, blockquotes, rules, lists and
 // inline formatting.
 function parseMarkdown(md) {
-  const lines = md.split(/\n/);
-  const out = [];
-  let inCodeBlock = false;
-  let codeBlockLang = "";
-  let inPre = false;
-  let tableBuffer = [];
-  let listStack = []; // ネストリスト用スタック
+  const lines = md.split(/\n/); // Split input into individual lines.
+  const out = []; // Accumulates resulting HTML lines.
+  let inCodeBlock = false; // Tracks whether parser is inside a fenced code block.
+  let codeBlockLang = ""; // Remembers language identifier after ``` for highlighting.
+  let inPre = false; // Tracks four-space indented preformatted blocks.
+  let tableBuffer = []; // Temporarily stores lines of a table until complete.
+  let listStack = []; // Stack storing nested list context.
 
   function getIndent(line) {
     const match = line.match(/^(\s*)/);
@@ -64,13 +64,21 @@ function parseMarkdown(md) {
 
   // Handle fenced code blocks (``` or ~~~).
   function handleCodeBlock(line) {
-    // Toggle code block when encountering a fence line.
-    if (/^```|^~~~/.test(line)) {
-      inCodeBlock = !inCodeBlock;
-      out.push(inCodeBlock ? "<pre><code>" : "</code></pre>");
+    const fenceMatch = line.match(/^(```|~~~)\s*(\w+)?$/);
+    if (fenceMatch) {
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        // fenceMatch[2] holds an optional language name like "js" for ```js
+        codeBlockLang = fenceMatch[2] || "";
+        const cls = codeBlockLang ? ` class="language-${codeBlockLang}"` : ""; // add class for syntax highlighters
+        out.push(`<pre><code${cls}>`);
+      } else {
+        inCodeBlock = false;
+        codeBlockLang = "";
+        out.push("</code></pre>");
+      }
       return true;
     }
-    // Inside a code block, escape HTML to preserve code.
     if (inCodeBlock) {
       out.push(escapeHtml(line));
       return true;
@@ -223,27 +231,51 @@ function renderTable(lines) {
   const header = lines[0]
     .split("|")
     .map((cell) => cell.trim())
-    .filter(Boolean);
+    .filter(Boolean); // first row contains header titles
   const aligns = lines[1]
     .split("|")
     .map((cell) => cell.trim())
-    .filter(Boolean);
+    .filter(Boolean); // second row defines column alignment like :---, ---:, :-:
   const rows = lines.slice(2).map((row) =>
     row
       .split("|")
       .map((cell) => cell.trim())
       .filter(Boolean)
-  );
+  ); // remaining rows are table body
+
+  const alignment = aligns.map((cell) => {
+    if (/^:-+:$/.test(cell)) return "center";
+    if (/^-+:$/.test(cell)) return "right";
+    if (/^:-+$/.test(cell)) return "left";
+    return null;
+  }); // resolved CSS alignment for each column
 
   let thead =
     "<thead><tr>" +
-    header.map((h) => `<th>${h}</th>`).join("") +
+    header
+      .map((h, i) => {
+        const align = alignment[i]
+          ? ` style="text-align:${alignment[i]}"`
+          : "";
+        return `<th${align}>${h}</th>`;
+      })
+      .join("") +
     "</tr></thead>";
   let tbody =
     "<tbody>" +
     rows
       .map(
-        (r) => "<tr>" + r.map((c) => `<td>${c}</td>`).join("") + "</tr>"
+        (r) =>
+          "<tr>" +
+          r
+            .map((c, i) => {
+              const align = alignment[i]
+                ? ` style="text-align:${alignment[i]}"`
+                : "";
+              return `<td${align}>${c}</td>`;
+            })
+            .join("") +
+          "</tr>"
       )
       .join("") +
     "</tbody>";
