@@ -1,0 +1,57 @@
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+textarea {
+  width: 50%;
+  height: 100vh;
+  padding: 1em;
+  border: none;
+  font-family: monospace;
+  font-size: 1em;
+}
+#preview {
+  width: 50%;
+  height: 100vh;
+  overflow: auto;
+  padding: 1em;
+  border-left: 1px solid #ccc;
+}
+.container {
+  display: flex;
+}
+pre {
+  background-color: #f0f0f0;
+  padding: 0.5em;
+}
+blockquote {
+  border-left: 4px solid #aaa;
+  padding-left: 1em;
+  color: #666;
+}
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+table,
+th,
+td {
+  border: 1px solid #ccc;
+}
+th,
+td {
+  padding: 0.5em;
+}
+code {
+  background: #f4f4f4;
+  padding: 0.2em 0.4em;
+  font-family: monospace;
+}
