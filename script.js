@@ -21,8 +21,21 @@ function parseMarkdown(md) {
   let codeBlockLang = "";
   let inPre = false;
   let tableBuffer = [];
-  let inList = false,
-    inOl = false;
+  let listStack = []; // ネストリスト用スタック
+
+  function getIndent(line) {
+    const match = line.match(/^(\s*)/);
+    return match ? match[1].length : 0;
+  }
+
+  function closeLists(currentIndent) {
+    while (
+      listStack.length > 0 &&
+      listStack[listStack.length - 1].indent >= currentIndent
+    ) {
+      out.push(listStack.pop().type === "ul" ? "</ul>" : "</ol>");
+    }
+  }
 
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
@@ -63,17 +76,20 @@ function parseMarkdown(md) {
     }
 
     if (/^\s*$/.test(line)) {
+      closeLists(0);
       out.push("<br>");
       continue;
     }
 
     if (/^#{1,6} /.test(line)) {
+      closeLists(0);
       const level = line.match(/^#+/)[0].length;
       out.push(`<h${level}>${line.slice(level).trim()}</h${level}>`);
       continue;
     }
 
     if (/^>+ /.test(line)) {
+      closeLists(0);
       const level = line.match(/^>+/)[0].length;
       line = line.replace(/^>+ /, "").trim();
       out.push(`<blockquote>${line}</blockquote>`);
@@ -81,32 +97,54 @@ function parseMarkdown(md) {
     }
 
     if (/^\*{3,}|-{3,}|_{3,}/.test(line)) {
+      closeLists(0);
       out.push("<hr>");
       continue;
     }
 
-    if (/^\d+\. /.test(line)) {
-      if (!inOl) {
-        out.push("<ol>");
-        inOl = true;
-      }
-      out.push(`<li>${line.replace(/^\d+\. /, "")}</li>`);
-      continue;
-    } else if (inOl) {
-      out.push("</ol>");
-      inOl = false;
-    }
+    // ネストリスト対応（スペース数で階層判定）
+    const ulMatch = line.match(/^(\s*)[-+*] (.*)/);
+    const olMatch = line.match(/^(\s*)\d+\. (.*)/);
+    if (ulMatch || olMatch) {
+      const indentSpaces = getIndent(line);
+      // 2スペースごとに階層を増やす
+      const indentLevel = Math.floor(indentSpaces / 2);
+      const type = ulMatch ? "ul" : "ol";
+      const itemText = (ulMatch ? ulMatch[2] : olMatch[2])
+        .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+        .replace(/___(.+?)___/g, "<strong><em>$1</em></strong>")
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/__(.+?)__/g, "<strong>$1</strong>")
+        .replace(/\*(.+?)\*/g, "<em>$1</em>")
+        .replace(/_(.+?)_/g, "<em>$1</em>")
+        .replace(/`(.+?)`/g, "<code>$1</code>")
+        .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
+        .replace(
+          /\[(.*?)\]\((.*?)\)/g,
+          '<a href="$2" target="_blank">$1</a>'
+        );
 
-    if (/^[-+*] /.test(line)) {
-      if (!inList) {
-        out.push("<ul>");
-        inList = true;
+      // 階層調整
+      if (
+        listStack.length === 0 ||
+        listStack[listStack.length - 1].indent < indentLevel
+      ) {
+        out.push(type === "ul" ? "<ul>" : "<ol>");
+        listStack.push({ type, indent: indentLevel });
+      } else {
+        closeLists(indentLevel);
+        if (
+          listStack.length === 0 ||
+          listStack[listStack.length - 1].type !== type
+        ) {
+          out.push(type === "ul" ? "<ul>" : "<ol>");
+          listStack.push({ type, indent: indentLevel });
+        }
       }
-      out.push(`<li>${line.replace(/^[-+*] /, "")}</li>`);
+      out.push(`<li>${itemText}</li>`);
       continue;
-    } else if (inList) {
-      out.push("</ul>");
-      inList = false;
+    } else {
+      closeLists(0);
     }
 
     // inline formatting
@@ -127,9 +165,8 @@ function parseMarkdown(md) {
     out.push(`<p>${line}</p>`);
   }
 
+  closeLists(0);
   if (inPre) out.push("</pre>");
-  if (inList) out.push("</ul>");
-  if (inOl) out.push("</ol>");
   if (tableBuffer.length > 0) out.push(renderTable(tableBuffer));
 
   return out.join("\n");
