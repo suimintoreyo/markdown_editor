@@ -14,6 +14,9 @@ function escapeHtml(text) {
   return text.replace(/[&<>]/g, (char) => map[char]);
 }
 
+// Parses Markdown line by line and delegates each construct to specialized
+// handlers for code blocks, tables, headings, blockquotes, rules, lists and
+// inline formatting.
 function parseMarkdown(md) {
   const lines = md.split(/\n/);
   const out = [];
@@ -37,72 +40,84 @@ function parseMarkdown(md) {
     }
   }
 
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-
+  // Handle fenced code blocks (``` or ~~~).
+  function handleCodeBlock(line) {
+    // Toggle code block when encountering a fence line.
     if (/^```|^~~~/.test(line)) {
       inCodeBlock = !inCodeBlock;
-      if (inCodeBlock) {
-        out.push("<pre><code>");
-      } else {
-        out.push("</code></pre>");
-      }
-      continue;
+      out.push(inCodeBlock ? "<pre><code>" : "</code></pre>");
+      return true;
     }
-
+    // Inside a code block, escape HTML to preserve code.
     if (inCodeBlock) {
       out.push(escapeHtml(line));
-      continue;
+      return true;
     }
+    return false;
+  }
 
+  // Handle four-space indented preformatted text.
+  function handlePreformatted(line) {
     if (/^\s{4,}/.test(line)) {
       if (!inPre) {
         out.push("<pre>");
         inPre = true;
       }
       out.push(escapeHtml(line));
-      continue;
+      return true;
     } else if (inPre) {
       out.push("</pre>");
       inPre = false;
     }
+    return false;
+  }
 
+  // Handle table lines delimited by pipes.
+  function handleTable(line) {
     if (/^\|.*\|$/.test(line)) {
       tableBuffer.push(line);
-      continue;
+      return true;
     } else if (tableBuffer.length > 0) {
       out.push(renderTable(tableBuffer));
       tableBuffer = [];
     }
+    return false;
+  }
 
-    if (/^\s*$/.test(line)) {
-      closeLists(0);
-      out.push("<br>");
-      continue;
-    }
-
+  // Handle headings defined by leading # symbols.
+  function handleHeading(line) {
     if (/^#{1,6} /.test(line)) {
       closeLists(0);
       const level = line.match(/^#+/)[0].length;
       out.push(`<h${level}>${line.slice(level).trim()}</h${level}>`);
-      continue;
+      return true;
     }
+    return false;
+  }
 
+  // Handle blockquotes starting with >.
+  function handleBlockquote(line) {
     if (/^>+ /.test(line)) {
       closeLists(0);
-      const level = line.match(/^>+/)[0].length;
       line = line.replace(/^>+ /, "").trim();
       out.push(`<blockquote>${line}</blockquote>`);
-      continue;
+      return true;
     }
+    return false;
+  }
 
+  // Handle horizontal rules of three or more *, -, or _.
+  function handleHorizontalRule(line) {
     if (/^\*{3,}|-{3,}|_{3,}/.test(line)) {
       closeLists(0);
       out.push("<hr>");
-      continue;
+      return true;
     }
+    return false;
+  }
 
-    // ネストリスト対応（スペース数で階層判定）
+  // Handle ordered and unordered lists with nesting.
+  function handleList(line) {
     const ulMatch = line.match(/^(\s*)[-+*] (.*)/);
     const olMatch = line.match(/^(\s*)\d+\. (.*)/);
     if (ulMatch || olMatch) {
@@ -110,21 +125,10 @@ function parseMarkdown(md) {
       // 2スペースごとに階層を増やす
       const indentLevel = Math.floor(indentSpaces / 2);
       const type = ulMatch ? "ul" : "ol";
-      const itemText = (ulMatch ? ulMatch[2] : olMatch[2])
-        .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-        .replace(/___(.+?)___/g, "<strong><em>$1</em></strong>")
-        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/__(.+?)__/g, "<strong>$1</strong>")
-        .replace(/\*(.+?)\*/g, "<em>$1</em>")
-        .replace(/_(.+?)_/g, "<em>$1</em>")
-        .replace(/`(.+?)`/g, "<code>$1</code>")
-        .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
-        .replace(
-          /\[(.*?)\]\((.*?)\)/g,
-          '<a href="$2" target="_blank">$1</a>'
-        );
-
-      // 階層調整
+      const itemText = applyInlineFormatting(
+        ulMatch ? ulMatch[2] : olMatch[2]
+      );
+      // Adjust nesting based on indentation.
       if (
         listStack.length === 0 ||
         listStack[listStack.length - 1].indent < indentLevel
@@ -142,13 +146,16 @@ function parseMarkdown(md) {
         }
       }
       out.push(`<li>${itemText}</li>`);
-      continue;
+      return true;
     } else {
       closeLists(0);
     }
+    return false;
+  }
 
-    // inline formatting
-    line = line
+  // Apply inline formatting for bold, italics, links, etc.
+  function applyInlineFormatting(text) {
+    return text
       .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
       .replace(/___(.+?)___/g, "<strong><em>$1</em></strong>")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -161,7 +168,41 @@ function parseMarkdown(md) {
         /\[(.*?)\]\((.*?)\)/g,
         '<a href="$2" target="_blank">$1</a>'
       );
+  }
 
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Handle fenced code blocks first.
+    if (handleCodeBlock(line)) continue;
+
+    // Handle preformatted text blocks.
+    if (handlePreformatted(line)) continue;
+
+    // Handle table syntax.
+    if (handleTable(line)) continue;
+
+    if (/^\s*$/.test(line)) {
+      // Blank lines break paragraphs and lists.
+      closeLists(0);
+      out.push("<br>");
+      continue;
+    }
+
+    // Handle headings (# to ######).
+    if (handleHeading(line)) continue;
+
+    // Handle blockquotes (lines starting with >).
+    if (handleBlockquote(line)) continue;
+
+    // Handle horizontal rules (***, --- or ___).
+    if (handleHorizontalRule(line)) continue;
+
+    // Handle ordered and unordered lists.
+    if (handleList(line)) continue;
+
+    // Apply inline formatting for remaining text.
+    line = applyInlineFormatting(line);
     out.push(`<p>${line}</p>`);
   }
 
