@@ -227,29 +227,37 @@ function parseMarkdown(md) {
   return out.join("\n");
 }
 
+// Convert an array of Markdown table lines (header, alignment and rows) into an HTML table string.
 function renderTable(lines) {
+  // Parse the header row to extract column titles.
   const header = lines[0]
     .split("|")
     .map((cell) => cell.trim())
-    .filter(Boolean); // first row contains header titles
+    .filter(Boolean);
+
+  // Parse the alignment definition row (e.g., :---, ---:, :-:).
   const aligns = lines[1]
     .split("|")
     .map((cell) => cell.trim())
-    .filter(Boolean); // second row defines column alignment like :---, ---:, :-:
+    .filter(Boolean);
+
+  // Convert the remaining lines into arrays of table cells.
   const rows = lines.slice(2).map((row) =>
     row
       .split("|")
       .map((cell) => cell.trim())
       .filter(Boolean)
-  ); // remaining rows are table body
+  );
 
+  // Translate alignment markers into corresponding CSS text-align values.
   const alignment = aligns.map((cell) => {
     if (/^:-+:$/.test(cell)) return "center";
     if (/^-+:$/.test(cell)) return "right";
     if (/^:-+$/.test(cell)) return "left";
     return null;
-  }); // resolved CSS alignment for each column
+  });
 
+  // Build the table header HTML while applying alignment styles.
   let thead =
     "<thead><tr>" +
     header
@@ -261,6 +269,8 @@ function renderTable(lines) {
       })
       .join("") +
     "</tr></thead>";
+
+  // Build the table body HTML for each row.
   let tbody =
     "<tbody>" +
     rows
