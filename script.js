@@ -19,6 +19,7 @@ function parseMarkdown(md) {
   const out = [];
   let inCodeBlock = false;
   let codeBlockLang = "";
+  let codeBuffer = [];
   let inPre = false;
   let tableBuffer = [];
   let inList = false,
@@ -27,18 +28,29 @@ function parseMarkdown(md) {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
 
-    if (/^```|^~~~/.test(line)) {
-      inCodeBlock = !inCodeBlock;
-      if (inCodeBlock) {
-        out.push("<pre><code>");
+    const fenceMatch = line.match(/^```(\w+)?/);
+    if (fenceMatch) {
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        codeBlockLang = fenceMatch[1] || "";
+        codeBuffer = [];
       } else {
-        out.push("</code></pre>");
+        inCodeBlock = false;
+        let code = codeBuffer.join("\n");
+        if (codeBlockLang === "javascript" || codeBlockLang === "js") {
+          code = highlightJavaScript(code);
+          out.push(`<pre><code class="language-javascript">${code}</code></pre>`);
+        } else {
+          out.push(`<pre><code>${escapeHtml(code)}</code></pre>`);
+        }
+        codeBlockLang = "";
+        codeBuffer = [];
       }
       continue;
     }
 
     if (inCodeBlock) {
-      out.push(escapeHtml(line));
+      codeBuffer.push(line);
       continue;
     }
 
@@ -133,6 +145,22 @@ function parseMarkdown(md) {
   if (tableBuffer.length > 0) out.push(renderTable(tableBuffer));
 
   return out.join("\n");
+}
+
+function highlightJavaScript(code) {
+  code = escapeHtml(code);
+  const jsSyntax = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|'(?:\\.|[^'])*'|"(?:\\.|[^"])*"|`(?:\\.|[^`])*`|\b\d+(?:\.\d+)?\b|\b(?:const|let|var|function|return|if|else|for|while|do|break|continue|switch|case|default|new|this|class|extends|super|import|from|export|try|catch|finally|throw)\b)/g;
+  return code.replace(jsSyntax, (match) => {
+    if (/^\/\//.test(match) || /^\/\*/.test(match)) {
+      return `<span class="js-comment">${match}</span>`;
+    } else if (/^['"`]/.test(match)) {
+      return `<span class="js-string">${match}</span>`;
+    } else if (/^\d/.test(match)) {
+      return `<span class="js-number">${match}</span>`;
+    } else {
+      return `<span class="js-keyword">${match}</span>`;
+    }
+  });
 }
 
 function renderTable(lines) {

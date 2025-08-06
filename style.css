@@ -55,3 +55,18 @@ code {
   padding: 0.2em 0.4em;
   font-family: monospace;
 }
+
+.js-keyword {
+  color: #0000ff;
+  font-weight: bold;
+}
+.js-string {
+  color: #a31515;
+}
+.js-comment {
+  color: #008000;
+  font-style: italic;
+}
+.js-number {
+  color: #09885a;
+}
