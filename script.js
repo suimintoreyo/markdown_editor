@@ -14,39 +14,37 @@ function escapeHtml(text) {
   return text.replace(/[&<>]/g, (char) => map[char]);
 }
 
-// Apply inline Markdown features such as emphasis, code, images and links.
+// 強調、コード、画像、リンクなどのインラインMarkdown機能を適用する。
 function applyInlineFormatting(text) {
   return (
     text
-      // Bold + italic using triple asterisks or underscores
+      // 三重のアスタリスクまたはアンダースコアで太字＋斜体
       .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
       .replace(/___(.+?)___/g, "<strong><em>$1</em></strong>")
-      // Bold using double asterisks or underscores
+      // 二重のアスタリスクまたはアンダースコアで太字
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/__(.+?)__/g, "<strong>$1</strong>")
-      // Italic using single asterisks or underscores
+      // 単一のアスタリスクまたはアンダースコアで斜体
       .replace(/\*(.+?)\*/g, "<em>$1</em>")
       .replace(/_(.+?)_/g, "<em>$1</em>")
-      // Inline code using backticks
+      // バッククォートでインラインコード
       .replace(/`(.+?)`/g, "<code>$1</code>")
-      // Images: ![alt](src)
+      // 画像: ![alt](src)
       .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
-      // Links: [text](url)
+      // リンク: [text](url)
       .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
   );
 }
 
-// Parses Markdown line by line and delegates each construct to specialized
-// handlers for code blocks, tables, headings, blockquotes, rules, lists and
-// inline formatting.
+// Markdownを1行ずつ解析し、コードブロック・テーブル・見出し・引用・区切り線・リスト・インライン装飾を各専用ハンドラーに委譲する。
 function parseMarkdown(md) {
-  const lines = md.split(/\n/); // Split input into individual lines.
-  const out = []; // Accumulates resulting HTML lines.
-  let inCodeBlock = false; // Tracks whether parser is inside a fenced code block.
-  let codeBlockLang = ""; // Remembers language identifier after ``` for highlighting.
-  let inPre = false; // Tracks four-space indented preformatted blocks.
-  let tableBuffer = []; // Temporarily stores lines of a table until complete.
-  let listStack = []; // Stack storing nested list context.
+  const lines = md.split(/\n/); // 入力を個々の行に分割する。
+  const out = []; // 生成されたHTML行を蓄積する。
+  let inCodeBlock = false; // フェンス付きコードブロック内にいるかを追跡する。
+  let codeBlockLang = ""; // ```の後の言語識別子を記憶する。
+  let inPre = false; // 4スペースのインデントによる整形済みブロック内かを追跡する。
+  let tableBuffer = []; // テーブル行を一時的に保持する。
+  let listStack = []; // ネストされたリストのコンテキストを保持するスタック。
 
   function getIndent(line) {
     const match = line.match(/^(\s*)/);
@@ -62,15 +60,15 @@ function parseMarkdown(md) {
     }
   }
 
-  // Handle fenced code blocks (``` or ~~~).
+  // フェンス付きコードブロック（``` または ~~~）を処理する。
   function handleCodeBlock(line) {
     const fenceMatch = line.match(/^(```|~~~)\s*(\w+)?$/);
     if (fenceMatch) {
       if (!inCodeBlock) {
         inCodeBlock = true;
-        // fenceMatch[2] holds an optional language name like "js" for ```js
+        // fenceMatch[2] には ```js のような言語名が入る。
         codeBlockLang = fenceMatch[2] || "";
-        const cls = codeBlockLang ? ` class="language-${codeBlockLang}"` : ""; // add class for syntax highlighters
+        const cls = codeBlockLang ? ` class="language-${codeBlockLang}"` : ""; // シンタックスハイライタ用のクラスを追加する。
         out.push(`<pre><code${cls}>`);
       } else {
         inCodeBlock = false;
@@ -86,7 +84,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // Handle four-space indented preformatted text.
+  // 4スペースでインデントされた整形済みテキストを処理する。
   function handlePreformatted(line) {
     if (/^\s{4,}/.test(line)) {
       if (!inPre) {
@@ -102,7 +100,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // Handle table lines delimited by pipes.
+  // パイプで区切られたテーブル行を処理する。
   function handleTable(line) {
     if (/^\|.*\|$/.test(line)) {
       tableBuffer.push(line);
@@ -114,7 +112,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // Handle headings defined by leading # symbols.
+  // 先頭の#で定義された見出しを処理する。
   function handleHeading(line) {
     if (/^#{1,6} /.test(line)) {
       closeLists(0);
@@ -125,7 +123,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // Handle blockquotes starting with >.
+  // > で始まる引用を処理する。
   function handleBlockquote(line) {
     if (/^>+ /.test(line)) {
       closeLists(0);
@@ -136,7 +134,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // Handle horizontal rules of three or more *, -, or _.
+  // 3つ以上の*, -, _による水平線を処理する。
   function handleHorizontalRule(line) {
     if (/^\*{3,}|-{3,}|_{3,}/.test(line)) {
       closeLists(0);
@@ -146,7 +144,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // Handle ordered and unordered lists with nesting.
+  // 入れ子のある順序付き・順序なしリストを処理する。
   function handleList(line) {
     const ulMatch = line.match(/^(\s*)[-+*] (.*)/);
     const olMatch = line.match(/^(\s*)\d+\. (.*)/);
@@ -155,11 +153,11 @@ function parseMarkdown(md) {
       // 2スペースごとに階層を増やす
       const indentLevel = Math.floor(indentSpaces / 2);
       const type = ulMatch ? "ul" : "ol";
-      // Apply inline Markdown features to the list item text.
+      // リスト項目のテキストにインラインMarkdown機能を適用する。
       const itemText = applyInlineFormatting(
         ulMatch ? ulMatch[2] : olMatch[2]
       );
-      // Adjust nesting based on indentation.
+      // インデントに基づいてネストを調整する。
       if (
         listStack.length === 0 ||
         listStack[listStack.length - 1].indent < indentLevel
@@ -187,35 +185,35 @@ function parseMarkdown(md) {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
 
-    // Handle fenced code blocks first.
+    // まずフェンス付きコードブロックを処理する。
     if (handleCodeBlock(line)) continue;
 
-    // Handle preformatted text blocks.
+    // 整形済みテキストブロックを処理する。
     if (handlePreformatted(line)) continue;
 
-    // Handle table syntax.
+    // テーブル構文を処理する。
     if (handleTable(line)) continue;
 
     if (/^\s*$/.test(line)) {
-      // Blank lines break paragraphs and lists.
+      // 空行は段落とリストを区切る。
       closeLists(0);
       out.push("<br>");
       continue;
     }
 
-    // Handle headings (# to ######).
+    // 見出し（# から ######）を処理する。
     if (handleHeading(line)) continue;
 
-    // Handle blockquotes (lines starting with >).
+    // 引用（>で始まる行）を処理する。
     if (handleBlockquote(line)) continue;
 
-    // Handle horizontal rules (***, --- or ___).
+    // 水平線（***、---、___）を処理する。
     if (handleHorizontalRule(line)) continue;
 
-    // Handle ordered and unordered lists.
+    // 順序付き・順序なしリストを処理する。
     if (handleList(line)) continue;
 
-    // Apply inline Markdown features to remaining text.
+    // 残りのテキストにインラインMarkdown機能を適用する。
     line = applyInlineFormatting(line);
     out.push(`<p>${line}</p>`);
   }
@@ -227,21 +225,21 @@ function parseMarkdown(md) {
   return out.join("\n");
 }
 
-// Convert an array of Markdown table lines (header, alignment and rows) into an HTML table string.
+// Markdownのテーブル行配列をHTMLテーブル文字列に変換する。
 function renderTable(lines) {
-  // Parse the header row to extract column titles.
+  // ヘッダー行を解析して列タイトルを抽出する。
   const header = lines[0]
     .split("|")
     .map((cell) => cell.trim())
     .filter(Boolean);
 
-  // Parse the alignment definition row (e.g., :---, ---:, :-:).
+  // 配置定義行（例: :---, ---:, :-:）を解析する。
   const aligns = lines[1]
     .split("|")
     .map((cell) => cell.trim())
     .filter(Boolean);
 
-  // Convert the remaining lines into arrays of table cells.
+  // 残りの行をテーブルセル配列に変換する。
   const rows = lines.slice(2).map((row) =>
     row
       .split("|")
@@ -249,7 +247,7 @@ function renderTable(lines) {
       .filter(Boolean)
   );
 
-  // Translate alignment markers into corresponding CSS text-align values.
+  // 配置マーカーをCSSのtext-align値に変換する。
   const alignment = aligns.map((cell) => {
     if (/^:-+:$/.test(cell)) return "center";
     if (/^-+:$/.test(cell)) return "right";
@@ -257,7 +255,7 @@ function renderTable(lines) {
     return null;
   });
 
-  // Build the table header HTML while applying alignment styles.
+  // 配置スタイルを適用しつつテーブルヘッダーのHTMLを構築する。
   let thead =
     "<thead><tr>" +
     header
@@ -270,7 +268,7 @@ function renderTable(lines) {
       .join("") +
     "</tr></thead>";
 
-  // Build the table body HTML for each row.
+  // 各行のテーブルボディHTMLを構築する。
   let tbody =
     "<tbody>" +
     rows
