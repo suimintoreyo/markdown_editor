@@ -14,6 +14,28 @@ function escapeHtml(text) {
   return text.replace(/[&<>]/g, (char) => map[char]);
 }
 
+// Apply inline Markdown features such as emphasis, code, images and links.
+function applyInlineFormatting(text) {
+  return (
+    text
+      // Bold + italic using triple asterisks or underscores
+      .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+      .replace(/___(.+?)___/g, "<strong><em>$1</em></strong>")
+      // Bold using double asterisks or underscores
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/__(.+?)__/g, "<strong>$1</strong>")
+      // Italic using single asterisks or underscores
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/_(.+?)_/g, "<em>$1</em>")
+      // Inline code using backticks
+      .replace(/`(.+?)`/g, "<code>$1</code>")
+      // Images: ![alt](src)
+      .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
+      // Links: [text](url)
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+  );
+}
+
 // Parses Markdown line by line and delegates each construct to specialized
 // handlers for code blocks, tables, headings, blockquotes, rules, lists and
 // inline formatting.
@@ -125,6 +147,7 @@ function parseMarkdown(md) {
       // 2スペースごとに階層を増やす
       const indentLevel = Math.floor(indentSpaces / 2);
       const type = ulMatch ? "ul" : "ol";
+      // Apply inline Markdown features to the list item text.
       const itemText = applyInlineFormatting(
         ulMatch ? ulMatch[2] : olMatch[2]
       );
@@ -151,23 +174,6 @@ function parseMarkdown(md) {
       closeLists(0);
     }
     return false;
-  }
-
-  // Apply inline formatting for bold, italics, links, etc.
-  function applyInlineFormatting(text) {
-    return text
-      .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-      .replace(/___(.+?)___/g, "<strong><em>$1</em></strong>")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/__(.+?)__/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/_(.+?)_/g, "<em>$1</em>")
-      .replace(/`(.+?)`/g, "<code>$1</code>")
-      .replace(/!\[(.*?)\]\((.*?)\)/g, '<img alt="$1" src="$2">')
-      .replace(
-        /\[(.*?)\]\((.*?)\)/g,
-        '<a href="$2" target="_blank">$1</a>'
-      );
   }
 
   for (let i = 0; i < lines.length; i++) {
@@ -201,7 +207,7 @@ function parseMarkdown(md) {
     // Handle ordered and unordered lists.
     if (handleList(line)) continue;
 
-    // Apply inline formatting for remaining text.
+    // Apply inline Markdown features to remaining text.
     line = applyInlineFormatting(line);
     out.push(`<p>${line}</p>`);
   }
