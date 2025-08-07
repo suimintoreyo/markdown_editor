@@ -315,5 +315,5 @@ function renderTable(lines) {
       .join("") +
     "</tbody>";
 
-  return `<table>${thead}${tbody}</table>`;
+  return `<table class="table table-bordered">${thead}${tbody}</table>`;
 }
