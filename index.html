@@ -4,22 +4,13 @@
     <meta charset="UTF-8" />
     <title>手動実装 Markdown Editor</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
   </head>
   <body>
     <div class="container">
       <textarea id="editor" placeholder="ここにMarkdownを入力"></textarea>
       <div id="preview"></div>
-    </div>
-    <!-- list 階層 test -->
-    <div>
-      <lu>
-        <li>
-          ::marker
-          <li>
-::marker
-          </li>
-          </li>
-          </lu>
     </div>
     <script src="script.js"></script>
   </body>
