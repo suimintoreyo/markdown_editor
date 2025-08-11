@@ -138,7 +138,7 @@ function parseMarkdown(md) {
     return false;
   }
 
-  // 3つ以上の*, -, _による水平線を処理する。
+  // ***, ---, ___による水平線を処理する。
   function handleHorizontalRule(line) {
     if (/^\*{3,}|-{3,}|_{3,}/.test(line)) {
       closeLists(0);
@@ -158,9 +158,7 @@ function parseMarkdown(md) {
       const indentLevel = Math.floor(indentSpaces / 2);
       const type = ulMatch ? "ul" : "ol";
       // リスト項目のテキストにインラインMarkdown機能を適用する。
-      const itemText = applyInlineFormatting(
-        ulMatch ? ulMatch[2] : olMatch[2]
-      );
+      const itemText = applyInlineFormatting(ulMatch ? ulMatch[2] : olMatch[2]);
       // インデントに基づいてネストを調整する。
       if (
         listStack.length === 0 ||
@@ -264,9 +262,7 @@ function renderTable(lines) {
     "<thead><tr>" +
     header
       .map((h, i) => {
-        const align = alignment[i]
-          ? ` style="text-align:${alignment[i]}"`
-          : "";
+        const align = alignment[i] ? ` style="text-align:${alignment[i]}"` : "";
         return `<th${align}>${h}</th>`;
       })
       .join("") +
