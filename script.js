@@ -78,7 +78,11 @@ function parseMarkdown(md) {
       return true;
     }
     if (inCodeBlock) {
-      out.push(escapeHtml(line));
+      if (codeBlockLang === "js") {
+        out.push(highlightJsSyntax(line));
+      } else {
+        out.push(escapeHtml(line));
+      }
       return true;
     }
     return false;
