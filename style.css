@@ -1,59 +1,50 @@
 body {
-  display: flex;
-  flex-direction: column;
   font-family: sans-serif;
   margin: 0;
   padding: 0;
 }
-textarea {
-  width: 50%;
-  height: 100vh;
-  padding: 1em;
-  border: none;
-  font-family: monospace;
-  font-size: 1em;
-}
+
+/* Make editor and preview full height */
+#editor,
 #preview {
-  width: 50%;
-  height: 100vh;
+  height: calc(100vh - 20px);
   overflow: auto;
+}
+
+/* Remove default textarea border and resize handle from bootstrap's form-control */
+#editor {
+  border-radius: 0;
+  resize: none;
+}
+
+#preview {
   padding: 1em;
-  border-left: 1px solid #ccc;
+  /* border-left is handled by bootstrap col separation, but let's add a subtle one */
+  border-left: 1px solid #dee2e6;
 }
-.container {
-  display: flex;
-}
+
 pre {
-  background-color: #f0f0f0;
-  padding: 0.5em;
+  background-color: #f8f9fa; /* Lighter gray */
+  padding: 1em;
+  border-radius: 0.25rem;
 }
 blockquote {
-  border-left: 4px solid #aaa;
-  padding-left: 1em;
-  color: #666;
+  border-left: 0.25rem solid #e9ecef;
+  padding-left: 1rem;
+  color: #6c757d; /* Bootstrap muted color */
+  margin-left: 0;
 }
 hr {
   border: none;
   border-top: 1px solid #ccc;
   margin: 1em 0;
 }
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-table,
-th,
-td {
-  border: 1px solid #ccc;
-}
-th,
-td {
-  padding: 0.5em;
-}
+
 code {
-  background: #f4f4f4;
+  background: #f8f9fa;
   padding: 0.2em 0.4em;
   font-family: monospace;
+  border-radius: 3px;
 }
 
 /* Syntax Highlighting Styles */
