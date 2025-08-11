@@ -46,21 +46,3 @@ code {
   font-family: monospace;
   border-radius: 3px;
 }
-
-/* Syntax Highlighting Styles */
-.keyword {
-  color: #0000ff; /* blue */
-  font-weight: bold;
-}
-.string {
-  color: #a31515; /* dark red */
-}
-.comment {
-  color: #008000; /* green */
-}
-.number {
-  color: #098658; /* dark teal */
-}
-.function-name {
-  color: #795e26; /* brown */
-}
