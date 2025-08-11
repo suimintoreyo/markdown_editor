@@ -24,3 +24,4 @@ const initialMarkdown = editor.value;
 const rawHtml = marked.parse(initialMarkdown);
 const sanitizedHtml = DOMPurify.sanitize(rawHtml);
 preview.innerHTML = sanitizedHtml;
+
