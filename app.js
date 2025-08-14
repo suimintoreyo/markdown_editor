@@ -1,5 +1,8 @@
-const editor = document.getElementById('editor');
-const preview = document.getElementById('preview');
+let editor, preview;
+if (typeof document !== 'undefined') {
+  editor = document.getElementById('editor');
+  preview = document.getElementById('preview');
+}
 
 function sanitize(str) {
   return str
@@ -12,8 +15,7 @@ function parseMarkdown(markdown) {
   const lines = markdown.split(/\r?\n/);
   let html = '';
   let inCode = false;
-  let inList = false;
-  let listType = null;
+  const listStack = [];
 
   lines.forEach((line) => {
     if (line.trim().startsWith('```')) {
@@ -32,6 +34,43 @@ function parseMarkdown(markdown) {
       return;
     }
 
+    const indentSpaces = line.match(/^ */)[0].length;
+    const trimmed = line.trimStart();
+    const ulMatch = /^[-*] /.test(trimmed);
+    const olMatch = /^[0-9]+\. /.test(trimmed);
+
+    if (ulMatch || olMatch) {
+      const type = ulMatch ? 'ul' : 'ol';
+      const content = ulMatch
+        ? trimmed.replace(/^[-*] /, '')
+        : trimmed.replace(/^[0-9]+\. /, '');
+      const depth = Math.floor(indentSpaces / 2) + 1;
+
+      while (depth < listStack.length) {
+        html += `</li></${listStack.pop()}>`;
+      }
+      if (depth === listStack.length && listStack.length > 0) {
+        html += '</li>';
+      }
+      while (depth > listStack.length) {
+        html += `<${type}>`;
+        listStack.push(type);
+      }
+      if (listStack.length === 0 || listStack[listStack.length - 1] !== type) {
+        if (listStack.length > 0) {
+          html += `</${listStack.pop()}>`;
+        }
+        html += `<${type}>`;
+        listStack.push(type);
+      }
+      html += `<li>${sanitize(content)}`;
+      return;
+    }
+
+    while (listStack.length > 0) {
+      html += `</li></${listStack.pop()}>`;
+    }
+
     if (/^#{1,6} /.test(line)) {
       const level = line.match(/^#{1,6}/)[0].length;
       html += `<h${level}>${sanitize(line.slice(level + 1))}</h${level}>`;
@@ -41,34 +80,6 @@ function parseMarkdown(markdown) {
     if (/^> /.test(line)) {
       html += `<blockquote>${sanitize(line.slice(2))}</blockquote>`;
       return;
-    }
-
-    if (/^[*-] /.test(line)) {
-      if (!inList || listType !== 'ul') {
-        if (inList) html += `</${listType}>`;
-        inList = true;
-        listType = 'ul';
-        html += '<ul>';
-      }
-      html += `<li>${sanitize(line.slice(2))}</li>`;
-      return;
-    }
-
-    if (/^[0-9]+\. /.test(line)) {
-      if (!inList || listType !== 'ol') {
-        if (inList) html += `</${listType}>`;
-        inList = true;
-        listType = 'ol';
-        html += '<ol>';
-      }
-      html += `<li>${sanitize(line.replace(/^[0-9]+\. /, ''))}</li>`;
-      return;
-    }
-
-    if (inList) {
-      html += `</${listType}>`;
-      inList = false;
-      listType = null;
     }
 
     if (/^---$/.test(line.trim())) {
@@ -88,28 +99,36 @@ function parseMarkdown(markdown) {
     html += `<p>${processed}</p>`;
   });
 
-  if (inList) html += `</${listType}>`;
+  while (listStack.length > 0) {
+    html += `</li></${listStack.pop()}>`;
+  }
   if (inCode) html += '</code></pre>';
   return html;
 }
 
-function render() {
-  const raw = editor.value;
-  const html = parseMarkdown(raw);
-  preview.innerHTML = html;
+if (typeof document !== 'undefined') {
+  function render() {
+    const raw = editor.value;
+    const html = parseMarkdown(raw);
+    preview.innerHTML = html;
+  }
+
+  editor.addEventListener('input', render);
+
+  editor.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      const value = editor.value;
+      editor.value = value.substring(0, start) + '    ' + value.substring(end);
+      editor.selectionStart = editor.selectionEnd = start + 4;
+    }
+  });
+
+  render();
 }
 
-editor.addEventListener('input', render);
-
-editor.addEventListener('keydown', (e) => {
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const start = editor.selectionStart;
-    const end = editor.selectionEnd;
-    const value = editor.value;
-    editor.value = value.substring(0, start) + '    ' + value.substring(end);
-    editor.selectionStart = editor.selectionEnd = start + 4;
-  }
-});
-
-render();
+if (typeof module !== 'undefined') {
+  module.exports = { parseMarkdown };
+}
