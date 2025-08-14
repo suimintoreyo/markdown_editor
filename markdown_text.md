@@ -9,3 +9,12 @@ function add(a, b) {
 }
 ```
 
+- Fruits
+  - Apple
+  - Banana
+    1. Cavendish
+    2. Plantain
+- Vegetables
+  1. Carrot
+  2. Broccoli
+
