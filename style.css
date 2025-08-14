@@ -1,48 +1,43 @@
 body {
-  font-family: sans-serif;
   margin: 0;
-  padding: 0;
+  font-family: sans-serif;
 }
 
-/* Make editor and preview full height */
-#editor,
-#preview {
-  height: calc(100vh - 20px);
-  overflow: auto;
+.container {
+  display: flex;
+  height: 100vh;
 }
 
-/* Remove default textarea border and resize handle from bootstrap's form-control */
 #editor {
-  border-radius: 0;
+  width: 50%;
+  padding: 1em;
+  border: none;
+  border-right: 1px solid #ccc;
   resize: none;
+  font-family: monospace;
 }
 
 #preview {
+  width: 50%;
   padding: 1em;
-  /* border-left is handled by bootstrap col separation, but let's add a subtle one */
-  border-left: 1px solid #dee2e6;
+  overflow-y: auto;
 }
 
 pre {
-  background-color: #f8f9fa; /* Lighter gray */
+  background: #f4f4f4;
   padding: 1em;
-  border-radius: 0.25rem;
-}
-blockquote {
-  border-left: 0.25rem solid #e9ecef;
-  padding-left: 1rem;
-  color: #6c757d; /* Bootstrap muted color */
-  margin-left: 0;
-}
-hr {
-  border: none;
-  border-top: 1px solid #ccc;
-  margin: 1em 0;
+  overflow: auto;
 }
 
 code {
-  background: #f8f9fa;
+  background: #f4f4f4;
   padding: 0.2em 0.4em;
-  font-family: monospace;
   border-radius: 3px;
+}
+
+blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  color: #666;
+  margin-left: 0;
 }
