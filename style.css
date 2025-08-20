@@ -1,0 +1,50 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+#editor {
+  width: 50%;
+  padding: 1em;
+  border: none;
+  border-right: 1px solid #ccc;
+  resize: none;
+  font-family: monospace;
+}
+
+#preview {
+  width: 50%;
+  padding: 1em;
+  overflow-y: auto;
+}
+
+pre {
+  background: #f4f4f4;
+  padding: 1em;
+  overflow: auto;
+}
+
+code:not(pre code) {
+  background: #f4f4f4;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+}
+
+pre code {
+  background: #f4f4f4;
+  padding: 0;
+  border-radius: 0;
+  display: block;
+}
+
+blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  color: #666;
+  margin-left: 0;
+}
