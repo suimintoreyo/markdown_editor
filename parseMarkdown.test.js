@@ -86,3 +86,63 @@ const plusListMd = '+ Item';
 const plusListExpected = '<ul><li>Item</li></ul>';
 assert.strictEqual(parseMarkdown(plusListMd), plusListExpected);
 console.log('Plus list marker test passed.');
+
+const deepOrderedListMd = `1. Level 1\n  1. Level 2\n    1. Level 3\n      1. Level 4\n2. Level 1 again`;
+const deepOrderedListExpected = '<ol><li>Level 1<ol><li>Level 2<ol><li>Level 3<ol><li>Level 4</li></ol></li></ol></li></ol></li><li>Level 1 again</li></ol>';
+assert.strictEqual(parseMarkdown(deepOrderedListMd), deepOrderedListExpected);
+console.log('Deep ordered list nesting test passed.');
+
+const variedNumberOrderedListMd = `3. Three\n1. One\n2. Two\n  7. Two-Seven\n5. Five`;
+const variedNumberOrderedListExpected = '<ol><li>Three</li><li>One</li><li>Two<ol><li>Two-Seven</li></ol></li><li>Five</li></ol>';
+assert.strictEqual(parseMarkdown(variedNumberOrderedListMd), variedNumberOrderedListExpected);
+console.log('Ordered list numbering variation test passed.');
+
+const linkMd = '[text](url)';
+const linkExpected = '<p><a href="url">text</a></p>';
+assert.strictEqual(parseMarkdown(linkMd), linkExpected);
+console.log('Link conversion test passed.');
+
+const refLinkMd = `[text][id]\n\n[id]: url`;
+const refLinkExpected = '<p><a href="url">text</a></p>';
+assert.strictEqual(parseMarkdown(refLinkMd), refLinkExpected);
+console.log('Reference link conversion test passed.');
+
+const imageMd = '![alt](url)';
+const imageExpected = '<p><img src="url" alt="alt" /></p>';
+assert.strictEqual(parseMarkdown(imageMd), imageExpected);
+console.log('Image conversion test passed.');
+
+const emStarMd = '*italic*';
+const emStarExpected = '<p><em>italic</em></p>';
+assert.strictEqual(parseMarkdown(emStarMd), emStarExpected);
+console.log('Asterisk emphasis test passed.');
+
+const emUnderscoreMd = '_italic_';
+const emUnderscoreExpected = '<p><em>italic</em></p>';
+assert.strictEqual(parseMarkdown(emUnderscoreMd), emUnderscoreExpected);
+console.log('Underscore emphasis test passed.');
+
+const strongStarMd = '**bold**';
+const strongStarExpected = '<p><strong>bold</strong></p>';
+assert.strictEqual(parseMarkdown(strongStarMd), strongStarExpected);
+console.log('Double asterisk strong test passed.');
+
+const strongUnderscoreMd = '__bold__';
+const strongUnderscoreExpected = '<p><strong>bold</strong></p>';
+assert.strictEqual(parseMarkdown(strongUnderscoreMd), strongUnderscoreExpected);
+console.log('Double underscore strong test passed.');
+
+const strongEmStarMd = '***both***';
+const strongEmStarExpected = '<p><strong><em>both</em></strong></p>';
+assert.strictEqual(parseMarkdown(strongEmStarMd), strongEmStarExpected);
+console.log('Triple asterisk strong and emphasis test passed.');
+
+const strongEmUnderscoreMd = '___both___';
+const strongEmUnderscoreExpected = '<p><strong><em>both</em></strong></p>';
+assert.strictEqual(parseMarkdown(strongEmUnderscoreMd), strongEmUnderscoreExpected);
+console.log('Triple underscore strong and emphasis test passed.');
+
+const tableMd = `| Name | Qty | Price |\n|:----|:---:|-----:|\n| Pen | 5 | 1.00 |\n| Pencil | 2 | 0.50 |`;
+const tableExpected = '<table><thead><tr><th style="text-align:left">Name</th><th style="text-align:center">Qty</th><th style="text-align:right">Price</th></tr></thead><tbody><tr><td style="text-align:left">Pen</td><td style="text-align:center">5</td><td style="text-align:right">1.00</td></tr><tr><td style="text-align:left">Pencil</td><td style="text-align:center">2</td><td style="text-align:right">0.50</td></tr></tbody></table>';
+assert.strictEqual(parseMarkdown(tableMd), tableExpected);
+console.log('Table with header and alignment test passed.');
