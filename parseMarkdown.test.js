@@ -141,3 +141,8 @@ const strongEmUnderscoreMd = '___both___';
 const strongEmUnderscoreExpected = '<p><strong><em>both</em></strong></p>';
 assert.strictEqual(parseMarkdown(strongEmUnderscoreMd), strongEmUnderscoreExpected);
 console.log('Triple underscore strong and emphasis test passed.');
+
+const tableMd = `| Name | Qty | Price |\n|:----|:---:|-----:|\n| Pen | 5 | 1.00 |\n| Pencil | 2 | 0.50 |`;
+const tableExpected = '<table><thead><tr><th style="text-align:left">Name</th><th style="text-align:center">Qty</th><th style="text-align:right">Price</th></tr></thead><tbody><tr><td style="text-align:left">Pen</td><td style="text-align:center">5</td><td style="text-align:right">1.00</td></tr><tr><td style="text-align:left">Pencil</td><td style="text-align:center">2</td><td style="text-align:right">0.50</td></tr></tbody></table>';
+assert.strictEqual(parseMarkdown(tableMd), tableExpected);
+console.log('Table with header and alignment test passed.');
