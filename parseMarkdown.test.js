@@ -107,6 +107,11 @@ const refLinkExpected = '<p><a href="url">text</a></p>';
 assert.strictEqual(parseMarkdown(refLinkMd), refLinkExpected);
 console.log('Reference link conversion test passed.');
 
+const imageMd = '![alt](url)';
+const imageExpected = '<p><img src="url" alt="alt" /></p>';
+assert.strictEqual(parseMarkdown(imageMd), imageExpected);
+console.log('Image conversion test passed.');
+
 const emStarMd = '*italic*';
 const emStarExpected = '<p><em>italic</em></p>';
 assert.strictEqual(parseMarkdown(emStarMd), emStarExpected);
