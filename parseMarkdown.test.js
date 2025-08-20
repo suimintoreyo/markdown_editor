@@ -71,3 +71,18 @@ const tabCodeMd = '\tline1\n\tline2';
 const tabCodeExpected = '<pre><code>line1\nline2\n</code></pre>';
 assert.strictEqual(parseMarkdown(tabCodeMd), tabCodeExpected);
 console.log('Indented code block (tab) parsing test passed.');
+
+const dashListMd = '- Item';
+const dashListExpected = '<ul><li>Item</li></ul>';
+assert.strictEqual(parseMarkdown(dashListMd), dashListExpected);
+console.log('Dash list marker test passed.');
+
+const starListMd = '* Item';
+const starListExpected = '<ul><li>Item</li></ul>';
+assert.strictEqual(parseMarkdown(starListMd), starListExpected);
+console.log('Asterisk list marker test passed.');
+
+const plusListMd = '+ Item';
+const plusListExpected = '<ul><li>Item</li></ul>';
+assert.strictEqual(parseMarkdown(plusListMd), plusListExpected);
+console.log('Plus list marker test passed.');
