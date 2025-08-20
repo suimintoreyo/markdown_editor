@@ -162,6 +162,7 @@ function parseMarkdown(markdown) {
     processed = processed.replace(/(\*\*|__)(.+?)\1/g, '<strong>$2</strong>');
     processed = processed.replace(/(\*|_)(.+?)\1/g, '<em>$2</em>');
     processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
+    processed = processed.replace(/!\[(.+?)\]\((.+?)\)/g, (m, alt, url) => `<img src="${url}" alt="${alt}" />`);
     processed = processed.replace(/\[(.+?)\]\((.+?)\)/g, (m, text, url) => `<a href="${url}">${text}</a>`);
     processed = processed.replace(/\[(.+?)\]\[(.+?)\]/g, (m, text, id) => {
       const url = refLinks[id.toLowerCase()];
