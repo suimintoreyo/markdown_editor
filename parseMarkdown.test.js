@@ -101,3 +101,8 @@ const linkMd = '[text](url)';
 const linkExpected = '<p><a href="url">text</a></p>';
 assert.strictEqual(parseMarkdown(linkMd), linkExpected);
 console.log('Link conversion test passed.');
+
+const refLinkMd = `[text][id]\n\n[id]: url`;
+const refLinkExpected = '<p><a href="url">text</a></p>';
+assert.strictEqual(parseMarkdown(refLinkMd), refLinkExpected);
+console.log('Reference link conversion test passed.');
