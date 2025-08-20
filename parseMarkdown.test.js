@@ -41,3 +41,8 @@ const tildeCodeBlockMd = '~~~\ncode\n~~~';
 const tildeCodeBlockExpected = '<pre><code>code\n</code></pre>';
 assert.strictEqual(parseMarkdown(tildeCodeBlockMd), tildeCodeBlockExpected);
 console.log('Tilde code block parsing test passed.');
+
+const inlineCodeMd = 'This has `code` inline';
+const inlineCodeExpected = '<p>This has <code>code</code> inline</p>';
+assert.strictEqual(parseMarkdown(inlineCodeMd), inlineCodeExpected);
+console.log('Inline code conversion test passed.');
