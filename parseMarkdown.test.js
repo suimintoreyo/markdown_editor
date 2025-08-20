@@ -106,3 +106,23 @@ const refLinkMd = `[text][id]\n\n[id]: url`;
 const refLinkExpected = '<p><a href="url">text</a></p>';
 assert.strictEqual(parseMarkdown(refLinkMd), refLinkExpected);
 console.log('Reference link conversion test passed.');
+
+const emStarMd = '*italic*';
+const emStarExpected = '<p><em>italic</em></p>';
+assert.strictEqual(parseMarkdown(emStarMd), emStarExpected);
+console.log('Asterisk emphasis test passed.');
+
+const emUnderscoreMd = '_italic_';
+const emUnderscoreExpected = '<p><em>italic</em></p>';
+assert.strictEqual(parseMarkdown(emUnderscoreMd), emUnderscoreExpected);
+console.log('Underscore emphasis test passed.');
+
+const strongStarMd = '**bold**';
+const strongStarExpected = '<p><strong>bold</strong></p>';
+assert.strictEqual(parseMarkdown(strongStarMd), strongStarExpected);
+console.log('Double asterisk strong test passed.');
+
+const strongUnderscoreMd = '__bold__';
+const strongUnderscoreExpected = '<p><strong>bold</strong></p>';
+assert.strictEqual(parseMarkdown(strongUnderscoreMd), strongUnderscoreExpected);
+console.log('Double underscore strong test passed.');
