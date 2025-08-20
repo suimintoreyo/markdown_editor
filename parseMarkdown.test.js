@@ -31,3 +31,13 @@ const blockquoteMd = `>>> Nested quote`;
 const blockquoteExpected = '<blockquote><blockquote><blockquote>Nested quote</blockquote></blockquote></blockquote>';
 assert.strictEqual(parseMarkdown(blockquoteMd), blockquoteExpected);
 console.log('Nested blockquote parsing test passed.');
+
+const backtickCodeBlockMd = '```\ncode\n```';
+const backtickCodeBlockExpected = '<pre><code>code\n</code></pre>';
+assert.strictEqual(parseMarkdown(backtickCodeBlockMd), backtickCodeBlockExpected);
+console.log('Backtick code block parsing test passed.');
+
+const tildeCodeBlockMd = '~~~\ncode\n~~~';
+const tildeCodeBlockExpected = '<pre><code>code\n</code></pre>';
+assert.strictEqual(parseMarkdown(tildeCodeBlockMd), tildeCodeBlockExpected);
+console.log('Tilde code block parsing test passed.');
