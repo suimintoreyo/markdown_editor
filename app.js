@@ -132,7 +132,7 @@ function parseMarkdown(markdown) {
       return;
     }
 
-    if (/^---$/.test(line.trim())) {
+    if (/^(?:---|\*\*\*|___)$/.test(line.trim())) {
       flushParagraph();
       html += '<hr />';
       return;
