@@ -28,6 +28,22 @@ function parseMarkdown(markdown) {
 
   lines.forEach((line) => {
     const trimmedLine = line.trim();
+
+    if (inCode && codeDelimiter === 'indent') {
+      if (/^( {4}|\t)/.test(line)) {
+        html += sanitize(line.replace(/^( {4}|\t)/, '')) + '\n';
+        return;
+      } else if (trimmedLine === '') {
+        html += '\n';
+        return;
+      } else {
+        html += '</code></pre>';
+        inCode = false;
+        codeDelimiter = null;
+        // fall through to process this line normally
+      }
+    }
+
     if (trimmedLine.startsWith('```') || trimmedLine.startsWith('~~~')) {
       flushParagraph();
       const delimiter = trimmedLine.slice(0, 3);
@@ -45,7 +61,7 @@ function parseMarkdown(markdown) {
       return;
     }
 
-    if (inCode) {
+    if (inCode && codeDelimiter !== 'indent') {
       html += sanitize(line) + '\n';
       return;
     }
@@ -81,6 +97,18 @@ function parseMarkdown(markdown) {
         listStack.push(type);
       }
       html += `<li>${sanitize(content)}`;
+      return;
+    }
+
+    if (/^( {4}|\t)/.test(line)) {
+      flushParagraph();
+      while (listStack.length > 0) {
+        html += `</li></${listStack.pop()}>`;
+      }
+      html += '<pre><code>';
+      inCode = true;
+      codeDelimiter = 'indent';
+      html += sanitize(line.replace(/^( {4}|\t)/, '')) + '\n';
       return;
     }
 

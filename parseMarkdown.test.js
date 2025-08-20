@@ -46,3 +46,13 @@ const inlineCodeMd = 'This has `code` inline';
 const inlineCodeExpected = '<p>This has <code>code</code> inline</p>';
 assert.strictEqual(parseMarkdown(inlineCodeMd), inlineCodeExpected);
 console.log('Inline code conversion test passed.');
+
+const indentedSpaceCodeMd = '    line1\n    line2';
+const indentedSpaceCodeExpected = '<pre><code>line1\nline2\n</code></pre>';
+assert.strictEqual(parseMarkdown(indentedSpaceCodeMd), indentedSpaceCodeExpected);
+console.log('Indented code block (spaces) parsing test passed.');
+
+const tabCodeMd = '\tline1\n\tline2';
+const tabCodeExpected = '<pre><code>line1\nline2\n</code></pre>';
+assert.strictEqual(parseMarkdown(tabCodeMd), tabCodeExpected);
+console.log('Indented code block (tab) parsing test passed.');
