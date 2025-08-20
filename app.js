@@ -68,14 +68,14 @@ function parseMarkdown(markdown) {
 
     const indentSpaces = line.match(/^ */)[0].length;
     const trimmed = line.trimStart();
-    const ulMatch = /^[-*] /.test(trimmed);
+    const ulMatch = /^[-*+] /.test(trimmed);
     const olMatch = /^[0-9]+\. /.test(trimmed);
 
     if (ulMatch || olMatch) {
       flushParagraph();
       const type = ulMatch ? 'ul' : 'ol';
       const content = ulMatch
-        ? trimmed.replace(/^[-*] /, '')
+        ? trimmed.replace(/^[-*+] /, '')
         : trimmed.replace(/^[0-9]+\. /, '');
       const depth = Math.floor(indentSpaces / 2) + 1;
 
