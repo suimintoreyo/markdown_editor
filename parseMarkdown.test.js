@@ -16,3 +16,13 @@ const output = parseMarkdown(md);
 assert.strictEqual(output, expected);
 
 console.log('Nested list parsing test passed.');
+
+const paragraphsMd = `First paragraph\n\nSecond paragraph`;
+const paragraphsExpected = '<p>First paragraph</p><p>Second paragraph</p>';
+assert.strictEqual(parseMarkdown(paragraphsMd), paragraphsExpected);
+console.log('Paragraph splitting test passed.');
+
+const lineBreakMd = `Line one  \nLine two`;
+const lineBreakExpected = '<p>Line one<br>Line two</p>';
+assert.strictEqual(parseMarkdown(lineBreakMd), lineBreakExpected);
+console.log('Line break conversion test passed.');
