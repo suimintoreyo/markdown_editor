@@ -12,7 +12,21 @@ function sanitize(str) {
 }
 
 function parseMarkdown(markdown) {
-  const lines = markdown.split(/\r?\n/);
+  const rawLines = markdown.split(/\r?\n/);
+  const refLinks = {};
+  const lines = [];
+
+  rawLines.forEach((line) => {
+    const defMatch = line.match(/^\s*\[(.+?)\]:\s*(\S+)/);
+    if (defMatch) {
+      const id = defMatch[1].trim().toLowerCase();
+      const url = sanitize(defMatch[2]);
+      refLinks[id] = url;
+    } else {
+      lines.push(line);
+    }
+  });
+
   let html = '';
   let inCode = false;
   let codeDelimiter = null;
@@ -148,6 +162,10 @@ function parseMarkdown(markdown) {
     processed = processed.replace(/\*(.+?)\*/g, '<em>$1</em>');
     processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
     processed = processed.replace(/\[(.+?)\]\((.+?)\)/g, (m, text, url) => `<a href="${url}">${text}</a>`);
+    processed = processed.replace(/\[(.+?)\]\[(.+?)\]/g, (m, text, id) => {
+      const url = refLinks[id.toLowerCase()];
+      return url ? `<a href="${url}">${text}</a>` : m;
+    });
     const hasBreak = /  $/.test(line);
     paragraph += processed;
     paragraph += hasBreak ? '<br>' : ' ';
