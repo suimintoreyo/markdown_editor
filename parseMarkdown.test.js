@@ -176,3 +176,11 @@ const h6Md = '###### Heading 6';
 const h6Expected = '<h6>Heading 6</h6>';
 assert.strictEqual(parseMarkdown(h6Md), h6Expected);
 console.log('Heading level 6 test passed.');
+const htmlEscapeMd = '<script>alert(1)</script>';
+const htmlEscapeExpected = '<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>';
+const htmlEscapeOutput = parseMarkdown(htmlEscapeMd);
+assert.strictEqual(htmlEscapeOutput, htmlEscapeExpected);
+const innerContent = htmlEscapeOutput.replace(/^<p>|<\/p>$/g, '');
+assert.ok(!/<[^>]+>/.test(innerContent));
+console.log('HTML escaping test passed.');
+
