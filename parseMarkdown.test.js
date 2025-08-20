@@ -32,6 +32,21 @@ const blockquoteExpected = '<blockquote><blockquote><blockquote>Nested quote</bl
 assert.strictEqual(parseMarkdown(blockquoteMd), blockquoteExpected);
 console.log('Nested blockquote parsing test passed.');
 
+const hrDashMd = '---';
+const hrDashExpected = '<hr />';
+assert.strictEqual(parseMarkdown(hrDashMd), hrDashExpected);
+console.log('Horizontal rule (dash) test passed.');
+
+const hrAsteriskMd = '***';
+const hrAsteriskExpected = '<hr />';
+assert.strictEqual(parseMarkdown(hrAsteriskMd), hrAsteriskExpected);
+console.log('Horizontal rule (asterisk) test passed.');
+
+const hrUnderscoreMd = '___';
+const hrUnderscoreExpected = '<hr />';
+assert.strictEqual(parseMarkdown(hrUnderscoreMd), hrUnderscoreExpected);
+console.log('Horizontal rule (underscore) test passed.');
+
 const backtickCodeBlockMd = '```\ncode\n```';
 const backtickCodeBlockExpected = '<pre><code>code\n</code></pre>';
 assert.strictEqual(parseMarkdown(backtickCodeBlockMd), backtickCodeBlockExpected);
