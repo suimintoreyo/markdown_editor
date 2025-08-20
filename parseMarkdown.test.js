@@ -96,3 +96,8 @@ const variedNumberOrderedListMd = `3. Three\n1. One\n2. Two\n  7. Two-Seven\n5. 
 const variedNumberOrderedListExpected = '<ol><li>Three</li><li>One</li><li>Two<ol><li>Two-Seven</li></ol></li><li>Five</li></ol>';
 assert.strictEqual(parseMarkdown(variedNumberOrderedListMd), variedNumberOrderedListExpected);
 console.log('Ordered list numbering variation test passed.');
+
+const linkMd = '[text](url)';
+const linkExpected = '<p><a href="url">text</a></p>';
+assert.strictEqual(parseMarkdown(linkMd), linkExpected);
+console.log('Link conversion test passed.');
