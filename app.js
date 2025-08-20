@@ -88,9 +88,12 @@ function parseMarkdown(markdown) {
       return;
     }
 
-    if (/^> /.test(line)) {
+    const bqMatch = line.match(/^(>+)\s*/);
+    if (bqMatch) {
       flushParagraph();
-      html += `<blockquote>${sanitize(line.slice(2))}</blockquote>`;
+      const depth = bqMatch[1].length;
+      const content = sanitize(line.slice(bqMatch[0].length));
+      html += '<blockquote>'.repeat(depth) + content + '</blockquote>'.repeat(depth);
       return;
     }
 

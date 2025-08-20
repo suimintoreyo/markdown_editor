@@ -26,3 +26,8 @@ const lineBreakMd = `Line one  \nLine two`;
 const lineBreakExpected = '<p>Line one<br>Line two</p>';
 assert.strictEqual(parseMarkdown(lineBreakMd), lineBreakExpected);
 console.log('Line break conversion test passed.');
+
+const blockquoteMd = `>>> Nested quote`;
+const blockquoteExpected = '<blockquote><blockquote><blockquote>Nested quote</blockquote></blockquote></blockquote>';
+assert.strictEqual(parseMarkdown(blockquoteMd), blockquoteExpected);
+console.log('Nested blockquote parsing test passed.');
