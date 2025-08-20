@@ -126,3 +126,13 @@ const strongUnderscoreMd = '__bold__';
 const strongUnderscoreExpected = '<p><strong>bold</strong></p>';
 assert.strictEqual(parseMarkdown(strongUnderscoreMd), strongUnderscoreExpected);
 console.log('Double underscore strong test passed.');
+
+const strongEmStarMd = '***both***';
+const strongEmStarExpected = '<p><strong><em>both</em></strong></p>';
+assert.strictEqual(parseMarkdown(strongEmStarMd), strongEmStarExpected);
+console.log('Triple asterisk strong and emphasis test passed.');
+
+const strongEmUnderscoreMd = '___both___';
+const strongEmUnderscoreExpected = '<p><strong><em>both</em></strong></p>';
+assert.strictEqual(parseMarkdown(strongEmUnderscoreMd), strongEmUnderscoreExpected);
+console.log('Triple underscore strong and emphasis test passed.');
