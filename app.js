@@ -15,6 +15,7 @@ function parseMarkdown(markdown) {
   const lines = markdown.split(/\r?\n/);
   let html = '';
   let inCode = false;
+  let codeDelimiter = null;
   const listStack = [];
   let paragraph = '';
 
@@ -26,14 +27,20 @@ function parseMarkdown(markdown) {
   };
 
   lines.forEach((line) => {
-    if (line.trim().startsWith('```')) {
+    const trimmedLine = line.trim();
+    if (trimmedLine.startsWith('```') || trimmedLine.startsWith('~~~')) {
       flushParagraph();
-      if (inCode) {
+      const delimiter = trimmedLine.slice(0, 3);
+      if (inCode && delimiter === codeDelimiter) {
         html += '</code></pre>';
         inCode = false;
-      } else {
+        codeDelimiter = null;
+      } else if (!inCode) {
         html += '<pre><code>';
         inCode = true;
+        codeDelimiter = delimiter;
+      } else {
+        html += sanitize(line) + '\n';
       }
       return;
     }
