@@ -40,16 +40,74 @@ function parseMarkdown(markdown) {
     }
   };
 
-  lines.forEach((line) => {
+  function splitTableRow(row) {
+    let cells = row.trim();
+    if (cells.startsWith('|')) cells = cells.slice(1);
+    if (cells.endsWith('|')) cells = cells.slice(0, -1);
+    return cells.split('|').map((c) => c.trim());
+  }
+
+  function parseAlign(line) {
+    const cells = splitTableRow(line);
+    const aligns = [];
+    for (const cell of cells) {
+      const trimmed = cell.trim();
+      if (!/^:?-+:?$/.test(trimmed)) return null;
+      let align = null;
+      const left = trimmed.startsWith(':');
+      const right = trimmed.endsWith(':');
+      if (left && right) align = 'center';
+      else if (left) align = 'left';
+      else if (right) align = 'right';
+      aligns.push(align);
+    }
+    return aligns;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
     const trimmedLine = line.trim();
 
+    const nextLine = lines[i + 1];
+    if (nextLine && line.includes('|')) {
+      const aligns = parseAlign(nextLine);
+      if (aligns && splitTableRow(line).length === aligns.length) {
+        flushParagraph();
+        while (listStack.length > 0) {
+          html += `</li></${listStack.pop()}>`;
+        }
+        const headers = splitTableRow(line);
+        let tableHtml = '<table><thead><tr>';
+        headers.forEach((cell, idx) => {
+          const align = aligns[idx];
+          const style = align ? ` style="text-align:${align}"` : '';
+          tableHtml += `<th${style}>${sanitize(cell)}</th>`;
+        });
+        tableHtml += '</tr></thead><tbody>';
+        i++; // skip alignment row
+        while (i + 1 < lines.length && lines[i + 1].includes('|')) {
+          const row = splitTableRow(lines[i + 1]);
+          i++;
+          tableHtml += '<tr>';
+          row.forEach((cell, idx) => {
+            const align = aligns[idx];
+            const style = align ? ` style="text-align:${align}"` : '';
+            tableHtml += `<td${style}>${sanitize(cell)}</td>`;
+          });
+          tableHtml += '</tr>';
+        }
+        tableHtml += '</tbody></table>';
+        html += tableHtml;
+        continue;
+      }
+    }
     if (inCode && codeDelimiter === 'indent') {
       if (/^( {4}|\t)/.test(line)) {
         html += sanitize(line.replace(/^( {4}|\t)/, '')) + '\n';
-        return;
+        continue;
       } else if (trimmedLine === '') {
         html += '\n';
-        return;
+        continue;
       } else {
         html += '</code></pre>';
         inCode = false;
@@ -72,12 +130,12 @@ function parseMarkdown(markdown) {
       } else {
         html += sanitize(line) + '\n';
       }
-      return;
+      continue;
     }
 
     if (inCode && codeDelimiter !== 'indent') {
       html += sanitize(line) + '\n';
-      return;
+      continue;
     }
 
     const indentSpaces = line.match(/^ */)[0].length;
@@ -111,7 +169,7 @@ function parseMarkdown(markdown) {
         listStack.push(type);
       }
       html += `<li>${sanitize(content)}`;
-      return;
+      continue;
     }
 
     if (/^( {4}|\t)/.test(line)) {
@@ -123,7 +181,7 @@ function parseMarkdown(markdown) {
       inCode = true;
       codeDelimiter = 'indent';
       html += sanitize(line.replace(/^( {4}|\t)/, '')) + '\n';
-      return;
+      continue;
     }
 
     while (listStack.length > 0) {
@@ -134,7 +192,7 @@ function parseMarkdown(markdown) {
       flushParagraph();
       const level = line.match(/^#{1,6}/)[0].length;
       html += `<h${level}>${sanitize(line.slice(level + 1))}</h${level}>`;
-      return;
+      continue;
     }
 
     const bqMatch = line.match(/^(>+)\s*/);
@@ -143,18 +201,18 @@ function parseMarkdown(markdown) {
       const depth = bqMatch[1].length;
       const content = sanitize(line.slice(bqMatch[0].length));
       html += '<blockquote>'.repeat(depth) + content + '</blockquote>'.repeat(depth);
-      return;
+      continue;
     }
 
     if (/^(?:---|\*\*\*|___)$/.test(line.trim())) {
       flushParagraph();
       html += '<hr />';
-      return;
+      continue;
     }
 
     if (line.trim() === '') {
       flushParagraph();
-      return;
+      continue;
     }
 
     let processed = sanitize(line).trimEnd();
@@ -171,7 +229,7 @@ function parseMarkdown(markdown) {
     const hasBreak = /  $/.test(line);
     paragraph += processed;
     paragraph += hasBreak ? '<br>' : ' ';
-  });
+  }
 
   while (listStack.length > 0) {
     html += `</li></${listStack.pop()}>`;
