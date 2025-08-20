@@ -146,3 +146,33 @@ const tableMd = `| Name | Qty | Price |\n|:----|:---:|-----:|\n| Pen | 5 | 1.00 
 const tableExpected = '<table><thead><tr><th style="text-align:left">Name</th><th style="text-align:center">Qty</th><th style="text-align:right">Price</th></tr></thead><tbody><tr><td style="text-align:left">Pen</td><td style="text-align:center">5</td><td style="text-align:right">1.00</td></tr><tr><td style="text-align:left">Pencil</td><td style="text-align:center">2</td><td style="text-align:right">0.50</td></tr></tbody></table>';
 assert.strictEqual(parseMarkdown(tableMd), tableExpected);
 console.log('Table with header and alignment test passed.');
+
+const h1Md = '# Heading 1';
+const h1Expected = '<h1>Heading 1</h1>';
+assert.strictEqual(parseMarkdown(h1Md), h1Expected);
+console.log('Heading level 1 test passed.');
+
+const h2Md = '## Heading 2';
+const h2Expected = '<h2>Heading 2</h2>';
+assert.strictEqual(parseMarkdown(h2Md), h2Expected);
+console.log('Heading level 2 test passed.');
+
+const h3Md = '### Heading 3';
+const h3Expected = '<h3>Heading 3</h3>';
+assert.strictEqual(parseMarkdown(h3Md), h3Expected);
+console.log('Heading level 3 test passed.');
+
+const h4Md = '#### Heading 4';
+const h4Expected = '<h4>Heading 4</h4>';
+assert.strictEqual(parseMarkdown(h4Md), h4Expected);
+console.log('Heading level 4 test passed.');
+
+const h5Md = '##### Heading 5';
+const h5Expected = '<h5>Heading 5</h5>';
+assert.strictEqual(parseMarkdown(h5Md), h5Expected);
+console.log('Heading level 5 test passed.');
+
+const h6Md = '###### Heading 6';
+const h6Expected = '<h6>Heading 6</h6>';
+assert.strictEqual(parseMarkdown(h6Md), h6Expected);
+console.log('Heading level 6 test passed.');
