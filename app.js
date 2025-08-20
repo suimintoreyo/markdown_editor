@@ -16,9 +16,18 @@ function parseMarkdown(markdown) {
   let html = '';
   let inCode = false;
   const listStack = [];
+  let paragraph = '';
+
+  const flushParagraph = () => {
+    if (paragraph.trim()) {
+      html += `<p>${paragraph.trim()}</p>`;
+      paragraph = '';
+    }
+  };
 
   lines.forEach((line) => {
     if (line.trim().startsWith('```')) {
+      flushParagraph();
       if (inCode) {
         html += '</code></pre>';
         inCode = false;
@@ -40,6 +49,7 @@ function parseMarkdown(markdown) {
     const olMatch = /^[0-9]+\. /.test(trimmed);
 
     if (ulMatch || olMatch) {
+      flushParagraph();
       const type = ulMatch ? 'ul' : 'ol';
       const content = ulMatch
         ? trimmed.replace(/^[-*] /, '')
@@ -72,37 +82,44 @@ function parseMarkdown(markdown) {
     }
 
     if (/^#{1,6} /.test(line)) {
+      flushParagraph();
       const level = line.match(/^#{1,6}/)[0].length;
       html += `<h${level}>${sanitize(line.slice(level + 1))}</h${level}>`;
       return;
     }
 
     if (/^> /.test(line)) {
+      flushParagraph();
       html += `<blockquote>${sanitize(line.slice(2))}</blockquote>`;
       return;
     }
 
     if (/^---$/.test(line.trim())) {
+      flushParagraph();
       html += '<hr />';
       return;
     }
 
     if (line.trim() === '') {
+      flushParagraph();
       return;
     }
 
-    let processed = sanitize(line);
+    let processed = sanitize(line).trimEnd();
     processed = processed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     processed = processed.replace(/\*(.+?)\*/g, '<em>$1</em>');
     processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
     processed = processed.replace(/\[(.+?)\]\((.+?)\)/g, (m, text, url) => `<a href="${url}">${text}</a>`);
-    html += `<p>${processed}</p>`;
+    const hasBreak = /  $/.test(line);
+    paragraph += processed;
+    paragraph += hasBreak ? '<br>' : ' ';
   });
 
   while (listStack.length > 0) {
     html += `</li></${listStack.pop()}>`;
   }
   if (inCode) html += '</code></pre>';
+  flushParagraph();
   return html;
 }
 
