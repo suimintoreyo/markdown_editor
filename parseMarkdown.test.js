@@ -86,3 +86,13 @@ const plusListMd = '+ Item';
 const plusListExpected = '<ul><li>Item</li></ul>';
 assert.strictEqual(parseMarkdown(plusListMd), plusListExpected);
 console.log('Plus list marker test passed.');
+
+const deepOrderedListMd = `1. Level 1\n  1. Level 2\n    1. Level 3\n      1. Level 4\n2. Level 1 again`;
+const deepOrderedListExpected = '<ol><li>Level 1<ol><li>Level 2<ol><li>Level 3<ol><li>Level 4</li></ol></li></ol></li></ol></li><li>Level 1 again</li></ol>';
+assert.strictEqual(parseMarkdown(deepOrderedListMd), deepOrderedListExpected);
+console.log('Deep ordered list nesting test passed.');
+
+const variedNumberOrderedListMd = `3. Three\n1. One\n2. Two\n  7. Two-Seven\n5. Five`;
+const variedNumberOrderedListExpected = '<ol><li>Three</li><li>One</li><li>Two<ol><li>Two-Seven</li></ol></li><li>Five</li></ol>';
+assert.strictEqual(parseMarkdown(variedNumberOrderedListMd), variedNumberOrderedListExpected);
+console.log('Ordered list numbering variation test passed.');
