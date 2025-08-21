@@ -37,7 +37,7 @@ code:not(pre code) {
 }
 
 pre code {
-  background: #f4f4f4;
+  background: inherit;
   padding: 0;
   border-radius: 0;
   display: block;
