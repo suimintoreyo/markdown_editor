@@ -7,11 +7,37 @@
   --num: #b5cea8;
   --com: #6a9955;
   --func: #dcdcaa;
+  --line-num: #858585;
 }
 
 pre, code {
   background: var(--code-bg);
   color: var(--code-txt);
+}
+
+pre {
+  counter-reset: line;
+  padding-left: 2.5em;
+  position: relative;
+}
+
+pre code {
+  display: block;
+}
+
+pre code > .line {
+  counter-increment: line;
+  display: block;
+  position: relative;
+}
+
+pre code > .line::before {
+  content: counter(line);
+  position: absolute;
+  left: -2.5em;
+  width: 2em;
+  text-align: right;
+  color: var(--line-num);
 }
 
 .tok-keyword {
@@ -47,6 +73,7 @@ pre, code {
   --num: #098658;
   --com: #008000;
   --func: #795e26;
+  --line-num: #999;
 }
 
 [data-theme="high-contrast"] {
@@ -58,4 +85,5 @@ pre, code {
   --num: #ffff00;
   --com: #ffffff;
   --func: #00ff00;
+  --line-num: #fff;
 }
