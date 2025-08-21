@@ -130,6 +130,11 @@
     }
   }
 
+  function addLineNumbers(block){
+    const lines = block.innerHTML.split(/\n/);
+    block.innerHTML = lines.map((line)=>`<span class="line">${line}</span>`).join('');
+  }
+
   // Tokenize a long code block piece by piece. Each CHUNK_SIZE slice is
   // scheduled via schedule() so work runs during idle periods. The DOM updates
   // once after all slices finish to minimize layout thrashing.
@@ -147,6 +152,7 @@
         schedule(()=>run(index + 1));
       } else {
         block.innerHTML = html;
+        addLineNumbers(block);
       }
     }
     schedule(()=>run(0));
@@ -167,6 +173,7 @@
         processLargeBlock(block, tokenizer);
       } else {
         block.innerHTML = tokenizer(text);
+        addLineNumbers(block);
         block.setAttribute('data-tokenized','1');
       }
     });
@@ -180,7 +187,26 @@
     observer.observe(document.body, {childList:true, subtree:true});
   }
 
+  function toggleTheme(theme){
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const current = root.getAttribute('data-theme');
+    if (theme){
+      if (current === theme){
+        root.removeAttribute('data-theme');
+      } else {
+        root.setAttribute('data-theme', theme);
+      }
+    } else {
+      root.removeAttribute('data-theme');
+    }
+  }
+
+  if (typeof window !== 'undefined'){
+    window.toggleTheme = toggleTheme;
+  }
+
   if (typeof module !== 'undefined'){
-    module.exports = { registerLanguage, tokenizeJava };
+    module.exports = { registerLanguage, tokenizeJava, toggleTheme };
   }
 })();
