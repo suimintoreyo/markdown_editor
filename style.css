@@ -5,20 +5,49 @@ body {
 
 .container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
 }
 
+.tabs {
+  display: flex;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 0.5em;
+  cursor: pointer;
+  background: #eee;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}
+
+.tabs button.active {
+  background: #fff;
+  border-bottom: none;
+}
+
+.pane {
+  flex: 1;
+  display: none;
+}
+
+.pane.active {
+  display: block;
+}
+
 #editor {
-  width: 50%;
+  width: 100%;
+  height: 100%;
   padding: 1em;
   border: none;
-  border-right: 1px solid #ccc;
   resize: none;
   font-family: monospace;
 }
 
 #preview {
-  width: 50%;
+  width: 100%;
+  height: 100%;
   padding: 1em;
   overflow-y: auto;
 }
