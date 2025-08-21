@@ -106,6 +106,44 @@
     return html;
   }
 
+  // When code blocks grow beyond 20k characters, tokenizing them in one go can
+  // freeze the UI. Large blocks are therefore processed in smaller pieces and
+  // scheduled during idle periods to keep rendering responsive.
+  const LONG_CODE_THRESHOLD = 20000; // Start chunking past ~20k chars
+  const CHUNK_SIZE = 5000; // Process in 5k character chunks
+
+  // Schedule a callback when the browser is idle; fall back to setTimeout to
+  // support environments without requestIdleCallback (e.g. Node tests).
+  function schedule(fn){
+    if (typeof requestIdleCallback === 'function'){
+      requestIdleCallback(fn);
+    } else {
+      setTimeout(fn, 0);
+    }
+  }
+
+  // Tokenize a long code block piece by piece. Each CHUNK_SIZE slice is
+  // scheduled via schedule() so work runs during idle periods. The DOM updates
+  // once after all slices finish to minimize layout thrashing.
+  function processLargeBlock(block, tokenizer){
+    const text = block.textContent;
+    const chunks = [];
+    for (let i = 0; i < text.length; i += CHUNK_SIZE){
+      chunks.push(text.slice(i, i + CHUNK_SIZE));
+    }
+    let html = '';
+    block.setAttribute('data-tokenized', '1'); // Avoid duplicate processing
+    function run(index){
+      html += tokenizer(chunks[index]);
+      if (index + 1 < chunks.length){
+        schedule(()=>run(index + 1));
+      } else {
+        block.innerHTML = html;
+      }
+    }
+    schedule(()=>run(0));
+  }
+
   function processBlocks(){
     if (typeof document === 'undefined') return;
     const blocks = document.querySelectorAll('code[class^="language-"][data-tokenized="0"]');
@@ -115,8 +153,14 @@
       const lang = m[1];
       const tokenizer = languages[lang];
       if (!tokenizer) return;
-      block.innerHTML = tokenizer(block.textContent);
-      block.setAttribute('data-tokenized','1');
+      const text = block.textContent;
+      if (text.length > LONG_CODE_THRESHOLD){
+        // Large blocks are tokenized asynchronously in chunks.
+        processLargeBlock(block, tokenizer);
+      } else {
+        block.innerHTML = tokenizer(text);
+        block.setAttribute('data-tokenized','1');
+      }
     });
   }
 
