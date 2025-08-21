@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { parseMarkdown } = require('./app');
+const { parseMarkdown, sanitize } = require('./app');
 
 const md = `- Fruits
   - Apple
@@ -48,14 +48,19 @@ assert.strictEqual(parseMarkdown(hrUnderscoreMd), hrUnderscoreExpected);
 console.log('Horizontal rule (underscore) test passed.');
 
 const backtickCodeBlockMd = '```\ncode\n```';
-const backtickCodeBlockExpected = '<pre><code>code\n</code></pre>';
+const backtickCodeBlockExpected = '<pre><button class="copy-btn">Copy</button><code class="language-" data-tokenized="0">code\n</code></pre>';
 assert.strictEqual(parseMarkdown(backtickCodeBlockMd), backtickCodeBlockExpected);
 console.log('Backtick code block parsing test passed.');
 
 const tildeCodeBlockMd = '~~~\ncode\n~~~';
-const tildeCodeBlockExpected = '<pre><code>code\n</code></pre>';
+const tildeCodeBlockExpected = '<pre><button class="copy-btn">Copy</button><code class="language-" data-tokenized="0">code\n</code></pre>';
 assert.strictEqual(parseMarkdown(tildeCodeBlockMd), tildeCodeBlockExpected);
 console.log('Tilde code block parsing test passed.');
+
+const langCodeBlockMd = '```javascript\nconsole.log(1);\n```';
+const langCodeBlockExpected = '<pre><button class="copy-btn">Copy</button><code class="language-javascript" data-tokenized="0">console.log(1);\n</code></pre>';
+assert.strictEqual(parseMarkdown(langCodeBlockMd), langCodeBlockExpected);
+console.log('Language code fence parsing test passed.');
 
 const inlineCodeMd = 'This has `code` inline';
 const inlineCodeExpected = '<p>This has <code>code</code> inline</p>';
@@ -63,12 +68,12 @@ assert.strictEqual(parseMarkdown(inlineCodeMd), inlineCodeExpected);
 console.log('Inline code conversion test passed.');
 
 const indentedSpaceCodeMd = '    line1\n    line2';
-const indentedSpaceCodeExpected = '<pre><code>line1\nline2\n</code></pre>';
+const indentedSpaceCodeExpected = '<pre><button class="copy-btn">Copy</button><code>line1\nline2\n</code></pre>';
 assert.strictEqual(parseMarkdown(indentedSpaceCodeMd), indentedSpaceCodeExpected);
 console.log('Indented code block (spaces) parsing test passed.');
 
 const tabCodeMd = '\tline1\n\tline2';
-const tabCodeExpected = '<pre><code>line1\nline2\n</code></pre>';
+const tabCodeExpected = '<pre><button class="copy-btn">Copy</button><code>line1\nline2\n</code></pre>';
 assert.strictEqual(parseMarkdown(tabCodeMd), tabCodeExpected);
 console.log('Indented code block (tab) parsing test passed.');
 
@@ -183,4 +188,16 @@ assert.strictEqual(htmlEscapeOutput, htmlEscapeExpected);
 const innerContent = htmlEscapeOutput.replace(/^<p>|<\/p>$/g, '');
 assert.ok(!/<[^>]+>/.test(innerContent));
 console.log('HTML escaping test passed.');
+
+const quoteMd = 'He said "Hello" and it\'s ok';
+const quoteExpected = '<p>He said &quot;Hello&quot; and it&#39;s ok</p>';
+assert.strictEqual(parseMarkdown(quoteMd), quoteExpected);
+console.log('Quote escaping test passed.');
+
+global.sanitize = sanitize;
+const { tokenizeJava } = require('./codeBlockSyntax_java.js');
+const tokenized = tokenizeJava('String s = "hi"; char c = \'c\';');
+assert.ok(tokenized.includes('&quot;hi&quot;'));
+assert.ok(tokenized.includes('&#39;c&#39;'));
+console.log('Tokenizer sanitization test passed.');
 

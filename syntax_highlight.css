@@ -1,0 +1,89 @@
+:root {
+  --code-bg: #1e1e1e;
+  --code-txt: #d4d4d4;
+  --kw: #c586c0;
+  --type: #4ec9b0;
+  --str: #ce9178;
+  --num: #b5cea8;
+  --com: #6a9955;
+  --func: #dcdcaa;
+  --line-num: #858585;
+}
+
+pre, code {
+  background: var(--code-bg);
+  color: var(--code-txt);
+}
+
+pre {
+  counter-reset: line;
+  padding-left: 2.5em;
+  position: relative;
+}
+
+pre code {
+  display: block;
+}
+
+pre code > .line {
+  counter-increment: line;
+  display: block;
+  position: relative;
+}
+
+pre code > .line::before {
+  content: counter(line);
+  position: absolute;
+  left: -2.5em;
+  width: 2em;
+  text-align: right;
+  color: var(--line-num);
+}
+
+.tok-keyword {
+  color: var(--kw);
+}
+
+.tok-type {
+  color: var(--type);
+}
+
+.tok-string {
+  color: var(--str);
+}
+
+.tok-number {
+  color: var(--num);
+}
+
+.tok-comment {
+  color: var(--com);
+}
+
+.tok-function {
+  color: var(--func);
+}
+
+[data-theme="light"] {
+  --code-bg: #f5f5f5;
+  --code-txt: #333;
+  --kw: #0000ff;
+  --type: #267f99;
+  --str: #a31515;
+  --num: #098658;
+  --com: #008000;
+  --func: #795e26;
+  --line-num: #999;
+}
+
+[data-theme="high-contrast"] {
+  --code-bg: #000;
+  --code-txt: #fff;
+  --kw: #ff9aff;
+  --type: #a4ffff;
+  --str: #ffb977;
+  --num: #ffff00;
+  --com: #ffffff;
+  --func: #00ff00;
+  --line-num: #fff;
+}

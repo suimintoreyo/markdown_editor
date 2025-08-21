@@ -1,14 +1,18 @@
-let editor, preview;
+let editor, preview, tabButtons, panes;
 if (typeof document !== 'undefined') {
   editor = document.getElementById('editor');
   preview = document.getElementById('preview');
+  tabButtons = document.querySelectorAll('.tabs button');
+  panes = document.querySelectorAll('.pane');
 }
 
 function sanitize(str) {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function parseMarkdown(markdown) {
@@ -124,7 +128,8 @@ function parseMarkdown(markdown) {
         inCode = false;
         codeDelimiter = null;
       } else if (!inCode) {
-        html += '<pre><code>';
+        const lang = trimmedLine.slice(3).trim();
+        html += `<pre><button class="copy-btn">Copy</button><code class="language-${lang}" data-tokenized="0">`;
         inCode = true;
         codeDelimiter = delimiter;
       } else {
@@ -177,7 +182,7 @@ function parseMarkdown(markdown) {
       while (listStack.length > 0) {
         html += `</li></${listStack.pop()}>`;
       }
-      html += '<pre><code>';
+      html += '<pre><button class="copy-btn">Copy</button><code>';
       inCode = true;
       codeDelimiter = 'indent';
       html += sanitize(line.replace(/^( {4}|\t)/, '')) + '\n';
@@ -244,7 +249,52 @@ if (typeof document !== 'undefined') {
     const raw = editor.value;
     const html = parseMarkdown(raw);
     preview.innerHTML = html;
+
+    const blocks = preview.querySelectorAll(
+      'pre code[class^="language-"][data-tokenized="0"]'
+    );
+    blocks.forEach((block) => {
+      const match = block.className.match(/language-([\w-]+)/);
+      if (match) {
+        const lang = match[1];
+        const registry =
+          (typeof window !== 'undefined' &&
+            (window.languages || window.tokenizers)) || {};
+        const tokenizer = registry[lang];
+        if (typeof tokenizer === 'function') {
+          block.innerHTML = tokenizer(block.textContent);
+          block.setAttribute('data-tokenized', '1');
+        }
+      }
+      const pre = block.closest('pre');
+      if (pre) {
+        const btn = pre.querySelector('.copy-btn');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            navigator.clipboard.writeText(block.textContent);
+          });
+        }
+      }
+    });
   }
+
+  function activatePane(targetId) {
+    panes.forEach((pane) => {
+      pane.classList.toggle('active', pane.id === targetId);
+    });
+    tabButtons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.target === targetId);
+    });
+    if (targetId === 'preview-pane') {
+      render();
+    }
+  }
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activatePane(btn.dataset.target);
+    });
+  });
 
   editor.addEventListener('input', render);
 
@@ -263,5 +313,5 @@ if (typeof document !== 'undefined') {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { parseMarkdown };
+  module.exports = { parseMarkdown, sanitize };
 }
