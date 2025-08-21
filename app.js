@@ -125,7 +125,7 @@ function parseMarkdown(markdown) {
         codeDelimiter = null;
       } else if (!inCode) {
         const lang = trimmedLine.slice(3).trim();
-        html += `<pre><code class="language-${lang}" data-tokenized="0">`;
+        html += `<pre><button class="copy-btn">Copy</button><code class="language-${lang}" data-tokenized="0">`;
         inCode = true;
         codeDelimiter = delimiter;
       } else {
@@ -178,7 +178,7 @@ function parseMarkdown(markdown) {
       while (listStack.length > 0) {
         html += `</li></${listStack.pop()}>`;
       }
-      html += '<pre><code>';
+      html += '<pre><button class="copy-btn">Copy</button><code>';
       inCode = true;
       codeDelimiter = 'indent';
       html += sanitize(line.replace(/^( {4}|\t)/, '')) + '\n';
@@ -245,6 +245,14 @@ if (typeof document !== 'undefined') {
     const raw = editor.value;
     const html = parseMarkdown(raw);
     preview.innerHTML = html;
+    const buttons = preview.querySelectorAll('.copy-btn');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const code = btn.nextElementSibling;
+        if (!code) return;
+        navigator.clipboard.writeText(code.textContent);
+      });
+    });
   }
 
   editor.addEventListener('input', render);
