@@ -124,7 +124,8 @@ function parseMarkdown(markdown) {
         inCode = false;
         codeDelimiter = null;
       } else if (!inCode) {
-        html += '<pre><code>';
+        const lang = trimmedLine.slice(3).trim();
+        html += `<pre><code class="language-${lang}" data-tokenized="0">`;
         inCode = true;
         codeDelimiter = delimiter;
       } else {

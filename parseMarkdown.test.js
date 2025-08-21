@@ -48,14 +48,19 @@ assert.strictEqual(parseMarkdown(hrUnderscoreMd), hrUnderscoreExpected);
 console.log('Horizontal rule (underscore) test passed.');
 
 const backtickCodeBlockMd = '```\ncode\n```';
-const backtickCodeBlockExpected = '<pre><code>code\n</code></pre>';
+const backtickCodeBlockExpected = '<pre><code class="language-" data-tokenized="0">code\n</code></pre>';
 assert.strictEqual(parseMarkdown(backtickCodeBlockMd), backtickCodeBlockExpected);
 console.log('Backtick code block parsing test passed.');
 
 const tildeCodeBlockMd = '~~~\ncode\n~~~';
-const tildeCodeBlockExpected = '<pre><code>code\n</code></pre>';
+const tildeCodeBlockExpected = '<pre><code class="language-" data-tokenized="0">code\n</code></pre>';
 assert.strictEqual(parseMarkdown(tildeCodeBlockMd), tildeCodeBlockExpected);
 console.log('Tilde code block parsing test passed.');
+
+const langCodeBlockMd = '```javascript\nconsole.log(1);\n```';
+const langCodeBlockExpected = '<pre><code class="language-javascript" data-tokenized="0">console.log(1);\n</code></pre>';
+assert.strictEqual(parseMarkdown(langCodeBlockMd), langCodeBlockExpected);
+console.log('Language code fence parsing test passed.');
 
 const inlineCodeMd = 'This has `code` inline';
 const inlineCodeExpected = '<p>This has <code>code</code> inline</p>';
