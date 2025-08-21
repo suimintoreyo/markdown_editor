@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { parseMarkdown } = require('./app');
+const { parseMarkdown, sanitize } = require('./app');
 
 const md = `- Fruits
   - Apple
@@ -188,4 +188,16 @@ assert.strictEqual(htmlEscapeOutput, htmlEscapeExpected);
 const innerContent = htmlEscapeOutput.replace(/^<p>|<\/p>$/g, '');
 assert.ok(!/<[^>]+>/.test(innerContent));
 console.log('HTML escaping test passed.');
+
+const quoteMd = 'He said "Hello" and it\'s ok';
+const quoteExpected = '<p>He said &quot;Hello&quot; and it&#39;s ok</p>';
+assert.strictEqual(parseMarkdown(quoteMd), quoteExpected);
+console.log('Quote escaping test passed.');
+
+global.sanitize = sanitize;
+const { tokenizeJava } = require('./codeBlockSyntax_java.js');
+const tokenized = tokenizeJava('String s = "hi"; char c = \'c\';');
+assert.ok(tokenized.includes('&quot;hi&quot;'));
+assert.ok(tokenized.includes('&#39;c&#39;'));
+console.log('Tokenizer sanitization test passed.');
 

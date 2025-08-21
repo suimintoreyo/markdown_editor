@@ -8,7 +8,9 @@ function sanitize(str) {
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function parseMarkdown(markdown) {
@@ -291,5 +293,5 @@ if (typeof document !== 'undefined') {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { parseMarkdown };
+  module.exports = { parseMarkdown, sanitize };
 }
