@@ -2,7 +2,15 @@
   const languages = {};
 
   function escapeHtml(str){
-    return str.replace(/&/g, '&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (typeof sanitize === 'function'){
+      return sanitize(str);
+    }
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   function wrap(type, text){
@@ -16,7 +24,7 @@
   function tokenizeJava(code){
     const keywordRe = /^(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|if|goto|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|record)\b/;
     const numberRe = /^(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d[\d_]*)?)[lLfFdD]?/;
-    const operatorRe = /^(?:==|!=|<=|>=|\+\+|--|&&|\|\||<<=|>>=|>>>|<<|>>|::|->|\+=|-=|\*=|/=|%=|&=|\|=|\^=|[+\-*/%&|^!~<>=?:])/;
+    const operatorRe = /^(?:==|!=|<=|>=|\+\+|--|&&|\|\||<<=|>>=|>>>|<<|>>|::|->|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[+\-*/%&|^!~<>=?:])/;
     const punctRe = /^[(){}\[\],.;]/;
     let html = '';
     let i = 0;
