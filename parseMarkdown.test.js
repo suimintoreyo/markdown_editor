@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { parseMarkdown, sanitize } = require('./app');
+const { parseMarkdown, sanitize } = require('./markdown_editor');
 
 const md = `- Fruits
   - Apple
