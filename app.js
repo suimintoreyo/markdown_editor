@@ -245,13 +245,32 @@ if (typeof document !== 'undefined') {
     const raw = editor.value;
     const html = parseMarkdown(raw);
     preview.innerHTML = html;
-    const buttons = preview.querySelectorAll('.copy-btn');
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const code = btn.nextElementSibling;
-        if (!code) return;
-        navigator.clipboard.writeText(code.textContent);
-      });
+
+    const blocks = preview.querySelectorAll(
+      'pre code[class^="language-"][data-tokenized="0"]'
+    );
+    blocks.forEach((block) => {
+      const match = block.className.match(/language-([\w-]+)/);
+      if (match) {
+        const lang = match[1];
+        const registry =
+          (typeof window !== 'undefined' &&
+            (window.languages || window.tokenizers)) || {};
+        const tokenizer = registry[lang];
+        if (typeof tokenizer === 'function') {
+          block.innerHTML = tokenizer(block.textContent);
+          block.setAttribute('data-tokenized', '1');
+        }
+      }
+      const pre = block.closest('pre');
+      if (pre) {
+        const btn = pre.querySelector('.copy-btn');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            navigator.clipboard.writeText(block.textContent);
+          });
+        }
+      }
     });
   }
 
