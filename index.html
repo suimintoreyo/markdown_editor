@@ -8,8 +8,16 @@
   </head>
   <body>
     <div class="container">
-      <textarea id="editor" placeholder="ここにMarkdownを入力"></textarea>
-      <div id="preview"></div>
+      <div class="tabs">
+        <button class="active" data-target="editor-pane">編集</button>
+        <button data-target="preview-pane">プレビュー</button>
+      </div>
+      <div id="editor-pane" class="pane active">
+        <textarea id="editor" placeholder="ここにMarkdownを入力"></textarea>
+      </div>
+      <div id="preview-pane" class="pane">
+        <div id="preview"></div>
+      </div>
     </div>
     <script src="app.js"></script>
     <script src="codeBlockSyntax_java.js"></script>
