@@ -1,7 +1,9 @@
-let editor, preview;
+let editor, preview, tabButtons, panes;
 if (typeof document !== 'undefined') {
   editor = document.getElementById('editor');
   preview = document.getElementById('preview');
+  tabButtons = document.querySelectorAll('.tabs button');
+  panes = document.querySelectorAll('.pane');
 }
 
 function sanitize(str) {
@@ -275,6 +277,24 @@ if (typeof document !== 'undefined') {
       }
     });
   }
+
+  function activatePane(targetId) {
+    panes.forEach((pane) => {
+      pane.classList.toggle('active', pane.id === targetId);
+    });
+    tabButtons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.target === targetId);
+    });
+    if (targetId === 'preview-pane') {
+      render();
+    }
+  }
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activatePane(btn.dataset.target);
+    });
+  });
 
   editor.addEventListener('input', render);
 
