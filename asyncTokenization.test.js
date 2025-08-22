@@ -1,4 +1,4 @@
-const assert = require('assert');
+import assert from 'node:assert';
 const piece = 'int a; ';
 let longCode = '';
 for (let i = 0; i < 3000; i++) longCode += piece; // ~21k characters
@@ -21,7 +21,7 @@ global.MutationObserver = function() {
   return { observe() {} };
 };
 
-require('./codeBlockSyntax_java.js');
+await import('./codeBlockSyntax_java.js');
 
 setTimeout(() => {
   assert(block.innerHTML.includes('<span class="tok tok-keyword">int</span>'));

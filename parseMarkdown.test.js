@@ -1,11 +1,11 @@
-const assert = require('assert');
-const {
+import assert from 'node:assert';
+import {
   parseMarkdown,
   sanitize,
   parseTables,
   parseLists,
   parseBlockquotes,
-} = require('./markdown_editor');
+} from './markdown_editor.js';
 
 const md = `- Fruits
   - Apple
@@ -224,8 +224,7 @@ assert.strictEqual(
 );
 console.log('parseBlockquotes basic test passed.');
 
-global.sanitize = sanitize;
-const { tokenizeJava } = require('./codeBlockSyntax_java.js');
+import { tokenizeJava } from './codeBlockSyntax_java.js';
 const tokenized = tokenizeJava('String s = "hi"; char c = \'c\';');
 assert.ok(tokenized.includes('&quot;hi&quot;'));
 assert.ok(tokenized.includes('&#39;c&#39;'));
