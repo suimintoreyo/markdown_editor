@@ -321,10 +321,55 @@ class MarkdownEditor {
   }
 }
 
+function renderMarkdownPreview(target, markdown = '') {
+  if (!target) return;
+  const html = parseMarkdown(markdown);
+  target.innerHTML = html;
+
+  const blocks = target.querySelectorAll(
+    'pre code[class^="language-"][data-tokenized="0"]'
+  );
+  blocks.forEach((block) => {
+    const match = block.className.match(/language-([\w-]+)/);
+    if (match) {
+      const lang = match[1];
+      const registry =
+        (typeof window !== 'undefined' &&
+          (window.languages || window.tokenizers)) || {};
+      const tokenizer = registry[lang];
+      if (typeof tokenizer === 'function') {
+        block.innerHTML = tokenizer(block.textContent);
+        block.setAttribute('data-tokenized', '1');
+      }
+    }
+    const pre = block.closest('pre');
+    if (pre) {
+      const btn = pre.querySelector('.copy-btn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(block.textContent);
+        });
+      }
+    }
+  });
+}
+
+function initPreview(outputEl, sourceText = '') {
+  renderMarkdownPreview(outputEl, sourceText);
+}
+
 if (typeof window !== 'undefined') {
   window.MarkdownEditor = MarkdownEditor;
+  window.renderMarkdownPreview = renderMarkdownPreview;
+  window.initPreview = initPreview;
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { parseMarkdown, sanitize, MarkdownEditor };
+  module.exports = {
+    parseMarkdown,
+    sanitize,
+    MarkdownEditor,
+    renderMarkdownPreview,
+    initPreview,
+  };
 }
