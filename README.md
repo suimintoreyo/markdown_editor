@@ -22,14 +22,18 @@ JavaScript で書かれたシンプルな Markdown エディタとプレビュ�
 
 <script src="markdown_editor.js"></script>
 <script>
-  new MarkdownEditor({
+  const editor = new MarkdownEditor({
     textarea: document.getElementById('editor'),
     preview: document.getElementById('preview'),
     tabButtons: document.querySelectorAll('.tabs button'),
     panes: document.querySelectorAll('.pane'),
   });
+  // 不要になったタイミングで
+  // editor.destroy();
 </script>
 ```
+
+生成されたインスタンスの `destroy()` を呼び出すと、イベントリスナが解除され参照がクリアされます。
 
 ### `renderMarkdownPreview`
 
