@@ -303,10 +303,13 @@ class MarkdownEditor {
     this.render = this.render.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.activatePane = this.activatePane.bind(this);
+    this.tabButtonHandlers = [];
     this.tabButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
+      const handler = () => {
         this.activatePane(btn.dataset.target);
-      });
+      };
+      btn.addEventListener('click', handler);
+      this.tabButtonHandlers.push({ btn, handler });
     });
     if (this.editor) {
       this.editor.addEventListener('input', this.render);
@@ -344,6 +347,22 @@ class MarkdownEditor {
         value.substring(0, start) + '    ' + value.substring(end);
       this.editor.selectionStart = this.editor.selectionEnd = start + 4;
     }
+  }
+
+  destroy() {
+    if (this.editor) {
+      this.editor.removeEventListener('input', this.render);
+      this.editor.removeEventListener('keydown', this.handleKeyDown);
+    }
+    this.tabButtonHandlers.forEach(({ btn, handler }) => {
+      btn.removeEventListener('click', handler);
+    });
+    this.editor = null;
+    this.preview = null;
+    this.tabButtons = [];
+    this.panes = [];
+    this.previewPane = null;
+    this.tabButtonHandlers = [];
   }
 }
 
