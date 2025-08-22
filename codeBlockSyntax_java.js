@@ -1,20 +1,15 @@
+let sanitize;
+if (typeof require !== 'undefined') {
+  sanitize = require('./sanitize').sanitize;
+} else if (typeof window !== 'undefined') {
+  sanitize = window.sanitize;
+}
+
 (function(){
   const languages = {};
 
-  function escapeHtml(str){
-    if (typeof sanitize === 'function'){
-      return sanitize(str);
-    }
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
   function wrap(type, text){
-    return `<span class="tok tok-${type}">${escapeHtml(text)}</span>`;
+    return `<span class="tok tok-${type}">${sanitize(text)}</span>`;
   }
 
   function registerLanguage(name, tokenizer){
@@ -108,7 +103,7 @@
         i += punct[0].length;
         continue;
       }
-      html += escapeHtml(rest[0]);
+      html += sanitize(rest[0]);
       i++;
     }
     return html;
