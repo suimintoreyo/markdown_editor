@@ -1,3 +1,8 @@
+:root {
+  --code-bg: #f4f4f4;
+  --code-txt: #333;
+}
+
 body {
   margin: 0;
   font-family: sans-serif;
@@ -58,7 +63,8 @@ body {
 }
 
 pre {
-  background: #f4f4f4;
+  background: var(--code-bg);
+  color: var(--code-txt);
   padding: 1em;
   overflow: auto;
   position: relative;
