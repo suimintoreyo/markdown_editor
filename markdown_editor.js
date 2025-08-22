@@ -1,9 +1,4 @@
-let sanitize;
-if (typeof require !== 'undefined') {
-  sanitize = require('./sanitize').sanitize;
-} else if (typeof window !== 'undefined') {
-  sanitize = window.sanitize;
-}
+import { sanitize } from './sanitize.js';
 
 function parseTables(lines, index) {
   const line = lines[index];
@@ -363,22 +358,14 @@ function initPreview(outputEl, sourceText = '') {
   renderMarkdownPreview(outputEl, sourceText);
 }
 
-if (typeof window !== 'undefined') {
-  window.MarkdownEditor = MarkdownEditor;
-  window.renderMarkdownPreview = renderMarkdownPreview;
-  window.initPreview = initPreview;
-}
-
-  if (typeof module !== 'undefined') {
-    module.exports = {
-      parseMarkdown,
-      parseTables,
-      parseLists,
-      parseBlockquotes,
-      sanitize,
-      MarkdownEditor,
-      renderMarkdownPreview,
-      initPreview,
-      processCodeBlocks,
-    };
-  }
+export {
+  parseMarkdown,
+  parseTables,
+  parseLists,
+  parseBlockquotes,
+  sanitize,
+  MarkdownEditor,
+  renderMarkdownPreview,
+  initPreview,
+  processCodeBlocks,
+};
