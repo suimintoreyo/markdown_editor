@@ -1,10 +1,8 @@
-function sanitize(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+let sanitize;
+if (typeof require !== 'undefined') {
+  sanitize = require('./sanitize').sanitize;
+} else if (typeof window !== 'undefined') {
+  sanitize = window.sanitize;
 }
 
 function parseTables(lines, index) {
