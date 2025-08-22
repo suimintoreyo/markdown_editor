@@ -236,6 +236,35 @@ function parseMarkdown(markdown) {
   return html;
 }
 
+function processCodeBlocks(container) {
+  const blocks = container.querySelectorAll(
+    'pre code[class^="language-"][data-tokenized="0"]'
+  );
+  blocks.forEach((block) => {
+    const match = block.className.match(/language-([\w-]+)/);
+    if (match) {
+      const lang = match[1];
+      const registry =
+        (typeof window !== 'undefined' &&
+          (window.languages || window.tokenizers)) || {};
+      const tokenizer = registry[lang];
+      if (typeof tokenizer === 'function') {
+        block.innerHTML = tokenizer(block.textContent);
+        block.setAttribute('data-tokenized', '1');
+      }
+    }
+    const pre = block.closest('pre');
+    if (pre) {
+      const btn = pre.querySelector('.copy-btn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(block.textContent);
+        });
+      }
+    }
+  });
+}
+
 class MarkdownEditor {
   constructor({ textarea, preview, tabButtons, panes } = {}) {
     if (typeof document === 'undefined') return;
@@ -267,33 +296,7 @@ class MarkdownEditor {
     const raw = this.editor.value;
     const html = parseMarkdown(raw);
     this.preview.innerHTML = html;
-
-    const blocks = this.preview.querySelectorAll(
-      'pre code[class^="language-"][data-tokenized="0"]'
-    );
-    blocks.forEach((block) => {
-      const match = block.className.match(/language-([\w-]+)/);
-      if (match) {
-        const lang = match[1];
-        const registry =
-          (typeof window !== 'undefined' &&
-            (window.languages || window.tokenizers)) || {};
-        const tokenizer = registry[lang];
-        if (typeof tokenizer === 'function') {
-          block.innerHTML = tokenizer(block.textContent);
-          block.setAttribute('data-tokenized', '1');
-        }
-      }
-      const pre = block.closest('pre');
-      if (pre) {
-        const btn = pre.querySelector('.copy-btn');
-        if (btn) {
-          btn.addEventListener('click', () => {
-            navigator.clipboard.writeText(block.textContent);
-          });
-        }
-      }
-    });
+    processCodeBlocks(this.preview);
   }
 
   activatePane(targetId) {
@@ -321,38 +324,12 @@ class MarkdownEditor {
   }
 }
 
-function renderMarkdownPreview(target, markdown = '') {
-  if (!target) return;
-  const html = parseMarkdown(markdown);
-  target.innerHTML = html;
-
-  const blocks = target.querySelectorAll(
-    'pre code[class^="language-"][data-tokenized="0"]'
-  );
-  blocks.forEach((block) => {
-    const match = block.className.match(/language-([\w-]+)/);
-    if (match) {
-      const lang = match[1];
-      const registry =
-        (typeof window !== 'undefined' &&
-          (window.languages || window.tokenizers)) || {};
-      const tokenizer = registry[lang];
-      if (typeof tokenizer === 'function') {
-        block.innerHTML = tokenizer(block.textContent);
-        block.setAttribute('data-tokenized', '1');
-      }
-    }
-    const pre = block.closest('pre');
-    if (pre) {
-      const btn = pre.querySelector('.copy-btn');
-      if (btn) {
-        btn.addEventListener('click', () => {
-          navigator.clipboard.writeText(block.textContent);
-        });
-      }
-    }
-  });
-}
+  function renderMarkdownPreview(target, markdown = '') {
+    if (!target) return;
+    const html = parseMarkdown(markdown);
+    target.innerHTML = html;
+    processCodeBlocks(target);
+  }
 
 function initPreview(outputEl, sourceText = '') {
   renderMarkdownPreview(outputEl, sourceText);
@@ -364,12 +341,13 @@ if (typeof window !== 'undefined') {
   window.initPreview = initPreview;
 }
 
-if (typeof module !== 'undefined') {
-  module.exports = {
-    parseMarkdown,
-    sanitize,
-    MarkdownEditor,
-    renderMarkdownPreview,
-    initPreview,
-  };
-}
+  if (typeof module !== 'undefined') {
+    module.exports = {
+      parseMarkdown,
+      sanitize,
+      MarkdownEditor,
+      renderMarkdownPreview,
+      initPreview,
+      processCodeBlocks,
+    };
+  }
