@@ -128,7 +128,7 @@ function parseMarkdown(markdown) {
         inCode = false;
         codeDelimiter = null;
       } else if (!inCode) {
-        const lang = trimmedLine.slice(3).trim();
+        const lang = trimmedLine.slice(3).trim().replace(/[^A-Za-z0-9_-]/g, '');
         html += `<pre><button class="copy-btn">Copy</button><code class="language-${lang}" data-tokenized="0">`;
         inCode = true;
         codeDelimiter = delimiter;

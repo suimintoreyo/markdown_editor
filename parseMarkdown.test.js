@@ -62,6 +62,11 @@ const langCodeBlockExpected = '<pre><button class="copy-btn">Copy</button><code 
 assert.strictEqual(parseMarkdown(langCodeBlockMd), langCodeBlockExpected);
 console.log('Language code fence parsing test passed.');
 
+const maliciousLangCodeBlockMd = '```"<img src=x onerror=alert(1)>\ncode\n```';
+const maliciousLangCodeBlockExpected = '<pre><button class="copy-btn">Copy</button><code class="language-imgsrcxonerroralert1" data-tokenized="0">code\n</code></pre>';
+assert.strictEqual(parseMarkdown(maliciousLangCodeBlockMd), maliciousLangCodeBlockExpected);
+console.log('Malicious language code fence sanitization test passed.');
+
 const inlineCodeMd = 'This has `code` inline';
 const inlineCodeExpected = '<p>This has <code>code</code> inline</p>';
 assert.strictEqual(parseMarkdown(inlineCodeMd), inlineCodeExpected);
