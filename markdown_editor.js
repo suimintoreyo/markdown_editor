@@ -1,11 +1,3 @@
-let editor, preview, tabButtons, panes;
-if (typeof document !== 'undefined') {
-  editor = document.getElementById('editor');
-  preview = document.getElementById('preview');
-  tabButtons = document.querySelectorAll('.tabs button');
-  panes = document.querySelectorAll('.pane');
-}
-
 function sanitize(str) {
   return str
     .replace(/&/g, '&amp;')
@@ -244,13 +236,39 @@ function parseMarkdown(markdown) {
   return html;
 }
 
-if (typeof document !== 'undefined') {
-  function render() {
-    const raw = editor.value;
-    const html = parseMarkdown(raw);
-    preview.innerHTML = html;
+class MarkdownEditor {
+  constructor({ textarea, preview, tabButtons, panes } = {}) {
+    if (typeof document === 'undefined') return;
+    this.editor = textarea || document.getElementById('editor');
+    this.preview = preview || document.getElementById('preview');
+    this.tabButtons = tabButtons
+      ? Array.from(tabButtons)
+      : Array.from(document.querySelectorAll('.tabs button'));
+    this.panes = panes
+      ? Array.from(panes)
+      : Array.from(document.querySelectorAll('.pane'));
+    this.previewPane = this.preview ? this.preview.closest('.pane') : null;
+    this.render = this.render.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.activatePane = this.activatePane.bind(this);
+    this.tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.activatePane(btn.dataset.target);
+      });
+    });
+    if (this.editor) {
+      this.editor.addEventListener('input', this.render);
+      this.editor.addEventListener('keydown', this.handleKeyDown);
+    }
+    this.render();
+  }
 
-    const blocks = preview.querySelectorAll(
+  render() {
+    const raw = this.editor.value;
+    const html = parseMarkdown(raw);
+    this.preview.innerHTML = html;
+
+    const blocks = this.preview.querySelectorAll(
       'pre code[class^="language-"][data-tokenized="0"]'
     );
     blocks.forEach((block) => {
@@ -278,40 +296,35 @@ if (typeof document !== 'undefined') {
     });
   }
 
-  function activatePane(targetId) {
-    panes.forEach((pane) => {
+  activatePane(targetId) {
+    this.panes.forEach((pane) => {
       pane.classList.toggle('active', pane.id === targetId);
     });
-    tabButtons.forEach((btn) => {
+    this.tabButtons.forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.target === targetId);
     });
-    if (targetId === 'preview-pane') {
-      render();
+    if (this.previewPane && targetId === this.previewPane.id) {
+      this.render();
     }
   }
 
-  tabButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      activatePane(btn.dataset.target);
-    });
-  });
-
-  editor.addEventListener('input', render);
-
-  editor.addEventListener('keydown', (e) => {
+  handleKeyDown(e) {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const start = editor.selectionStart;
-      const end = editor.selectionEnd;
-      const value = editor.value;
-      editor.value = value.substring(0, start) + '    ' + value.substring(end);
-      editor.selectionStart = editor.selectionEnd = start + 4;
+      const start = this.editor.selectionStart;
+      const end = this.editor.selectionEnd;
+      const value = this.editor.value;
+      this.editor.value =
+        value.substring(0, start) + '    ' + value.substring(end);
+      this.editor.selectionStart = this.editor.selectionEnd = start + 4;
     }
-  });
+  }
+}
 
-  render();
+if (typeof window !== 'undefined') {
+  window.MarkdownEditor = MarkdownEditor;
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { parseMarkdown, sanitize };
+  module.exports = { parseMarkdown, sanitize, MarkdownEditor };
 }
