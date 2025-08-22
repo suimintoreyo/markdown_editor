@@ -1,6 +1,4 @@
 :root {
-  --code-bg: #1e1e1e;
-  --code-txt: #d4d4d4;
   --kw: #c586c0;
   --type: #4ec9b0;
   --str: #ce9178;
@@ -11,7 +9,6 @@
 }
 
 pre, code {
-  background: var(--code-bg);
   color: var(--code-txt);
 }
 
@@ -65,7 +62,6 @@ pre code > .line::before {
 }
 
 [data-theme="light"] {
-  --code-bg: #f5f5f5;
   --code-txt: #333;
   --kw: #0000ff;
   --type: #267f99;
@@ -77,7 +73,6 @@ pre code > .line::before {
 }
 
 [data-theme="high-contrast"] {
-  --code-bg: #000;
   --code-txt: #fff;
   --kw: #ff9aff;
   --type: #a4ffff;
