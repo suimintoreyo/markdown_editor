@@ -38,6 +38,23 @@ const blockquoteExpected = '<blockquote><blockquote><blockquote>Nested quote</bl
 assert.strictEqual(parseMarkdown(blockquoteMd), blockquoteExpected);
 console.log('Nested blockquote parsing test passed.');
 
+const multiLineBlockquoteMd = `> line1\n> line2`;
+const multiLineBlockquoteExpected = '<blockquote>line1<br>line2</blockquote>';
+assert.strictEqual(
+  parseMarkdown(multiLineBlockquoteMd),
+  multiLineBlockquoteExpected
+);
+console.log('Multi-line blockquote parsing test passed.');
+
+const nestedMultiBlockquoteMd = `> outer\n>> inner1\n>> inner2\n> outer2`;
+const nestedMultiBlockquoteExpected =
+  '<blockquote>outer<br><blockquote>inner1<br>inner2</blockquote><br>outer2</blockquote>';
+assert.strictEqual(
+  parseMarkdown(nestedMultiBlockquoteMd),
+  nestedMultiBlockquoteExpected
+);
+console.log('Nested multi-line blockquote parsing test passed.');
+
 const hrDashMd = '---';
 const hrDashExpected = '<hr />';
 assert.strictEqual(parseMarkdown(hrDashMd), hrDashExpected);
@@ -217,11 +234,11 @@ const tableExpectedPure =
 assert.deepStrictEqual(tableRes, { html: tableExpectedPure, nextIndex: 2 });
 console.log('parseTables basic test passed.');
 
-const bqRes = parseBlockquotes('>> Quote');
-assert.strictEqual(
-  bqRes.html,
-  '<blockquote><blockquote>Quote</blockquote></blockquote>'
-);
+const bqRes = parseBlockquotes('>> Quote', 0);
+assert.deepStrictEqual(bqRes, {
+  html: '<blockquote><blockquote>Quote',
+  depth: 2,
+});
 console.log('parseBlockquotes basic test passed.');
 
 import { tokenizeJava } from './codeBlockSyntax_java.js';

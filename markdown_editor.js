@@ -102,12 +102,25 @@ function parseLists(line, listStack) {
   return { html, listStack: newStack };
 }
 
-function parseBlockquotes(line) {
-  const bqMatch = line.match(/^(>+)\s*/);
+function parseBlockquotes(line, currentDepth = 0) {
+  const bqMatch = line.match(/^(>+)(?:\s?)(.*)$/);
   if (!bqMatch) return null;
   const depth = bqMatch[1].length;
-  const content = sanitize(line.slice(bqMatch[0].length));
-  return { html: '<blockquote>'.repeat(depth) + content + '</blockquote>'.repeat(depth) };
+  const content = sanitize(bqMatch[2] || '');
+  let html = '';
+
+  if (depth > currentDepth) {
+    if (currentDepth > 0) html += '<br>';
+    for (let i = currentDepth; i < depth; i++) html += '<blockquote>';
+  } else if (depth === currentDepth) {
+    if (currentDepth > 0) html += '<br>';
+  } else {
+    for (let i = currentDepth; i > depth; i--) html += '</blockquote>';
+    if (depth > 0) html += '<br>';
+  }
+
+  html += content;
+  return { html, depth };
 }
 
 function parseMarkdown(markdown) {
@@ -130,6 +143,7 @@ function parseMarkdown(markdown) {
   let inCode = false;
   let codeDelimiter = null;
   const listStack = [];
+  let blockquoteDepth = 0;
   let paragraph = '';
 
   const flushParagraph = () => {
@@ -142,6 +156,17 @@ function parseMarkdown(markdown) {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
     const trimmedLine = line.trim();
+
+    const bqRes = parseBlockquotes(line, blockquoteDepth);
+    if (bqRes) {
+      flushParagraph();
+      html += bqRes.html;
+      blockquoteDepth = bqRes.depth;
+      continue;
+    } else if (blockquoteDepth > 0) {
+      html += '</blockquote>'.repeat(blockquoteDepth);
+      blockquoteDepth = 0;
+    }
 
     const tableRes = parseTables(lines, i);
     if (tableRes) {
@@ -224,13 +249,6 @@ function parseMarkdown(markdown) {
       continue;
     }
 
-    const bqRes = parseBlockquotes(line);
-    if (bqRes) {
-      flushParagraph();
-      html += bqRes.html;
-      continue;
-    }
-
     if (/^(?:---|\*\*\*|___)$/.test(line.trim())) {
       flushParagraph();
       html += '<hr />';
@@ -260,6 +278,10 @@ function parseMarkdown(markdown) {
 
   while (listStack.length > 0) {
     html += `</li></${listStack.pop()}>`;
+  }
+  while (blockquoteDepth > 0) {
+    html += '</blockquote>';
+    blockquoteDepth--;
   }
   if (inCode) html += '</code></pre>';
   flushParagraph();
