@@ -312,7 +312,13 @@ function processCodeBlocks(container) {
       const btn = pre.querySelector('.copy-btn');
       if (btn) {
         btn.addEventListener('click', () => {
-          navigator.clipboard.writeText(block.textContent);
+          if (navigator.clipboard) {
+            navigator.clipboard
+              .writeText(block.textContent)
+              .catch((err) => {
+                console.error('Failed to copy text to clipboard:', err);
+              });
+          }
         });
       }
     }
