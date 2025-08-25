@@ -1,2 +1,4 @@
 # markdown_editor
-JavaScript markdown editor
+
+JavaScript で書かれたシンプルな Markdown エディタとプレビュー用ユーティリティです。
+

@@ -1,5 +1,5 @@
-const assert = require('assert');
-const { tokenizeJava } = require('./codeBlockSyntax_java');
+import assert from 'node:assert';
+import { tokenizeJava } from './codeBlockSyntax_java.js';
 
 // Basic class and method tokenization
 let output = tokenizeJava(

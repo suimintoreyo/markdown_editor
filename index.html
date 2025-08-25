@@ -19,7 +19,18 @@
         <div id="preview"></div>
       </div>
     </div>
-    <script src="markdown_editor.js"></script>
-    <script src="codeBlockSyntax_java.js"></script>
+    <script type="module">
+      import { MarkdownEditor } from './markdown_editor.js';
+      import { toggleTheme } from './codeBlockSyntax_java.js';
+
+      new MarkdownEditor({
+        textarea: document.getElementById('editor'),
+        preview: document.getElementById('preview'),
+        tabButtons: document.querySelectorAll('.tabs button'),
+        panes: document.querySelectorAll('.pane'),
+      });
+
+      window.toggleTheme = toggleTheme;
+    </script>
   </body>
 </html>

@@ -1,5 +1,11 @@
-const assert = require('assert');
-const { parseMarkdown, sanitize } = require('./markdown_editor');
+import assert from 'node:assert';
+import {
+  parseMarkdown,
+  sanitize,
+  parseTables,
+  parseLists,
+  parseBlockquotes,
+} from './markdown_editor.js';
 
 const md = `- Fruits
   - Apple
@@ -199,8 +205,26 @@ const quoteExpected = '<p>He said &quot;Hello&quot; and it&#39;s ok</p>';
 assert.strictEqual(parseMarkdown(quoteMd), quoteExpected);
 console.log('Quote escaping test passed.');
 
-global.sanitize = sanitize;
-const { tokenizeJava } = require('./codeBlockSyntax_java.js');
+// Pure function tests
+const listRes = parseLists('- Item', []);
+assert.deepStrictEqual(listRes, { html: '<ul><li>Item', listStack: ['ul'] });
+console.log('parseLists basic test passed.');
+
+const tableLines = ['| A |', '| - |', '| B |'];
+const tableRes = parseTables(tableLines, 0);
+const tableExpectedPure =
+  '<table><thead><tr><th>A</th></tr></thead><tbody><tr><td>B</td></tr></tbody></table>';
+assert.deepStrictEqual(tableRes, { html: tableExpectedPure, nextIndex: 2 });
+console.log('parseTables basic test passed.');
+
+const bqRes = parseBlockquotes('>> Quote');
+assert.strictEqual(
+  bqRes.html,
+  '<blockquote><blockquote>Quote</blockquote></blockquote>'
+);
+console.log('parseBlockquotes basic test passed.');
+
+import { tokenizeJava } from './codeBlockSyntax_java.js';
 const tokenized = tokenizeJava('String s = "hi"; char c = \'c\';');
 assert.ok(tokenized.includes('&quot;hi&quot;'));
 assert.ok(tokenized.includes('&#39;c&#39;'));
