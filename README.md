@@ -9,15 +9,15 @@ JavaScript で書かれたシンプルな Markdown エディタとプレビュ�
 ### 素の HTML での利用
 
 ```html
-<textarea id="editor"></textarea>
-<div id="preview"></div>
+<textarea class="editor"></textarea>
+<div class="preview"></div>
 <script type="module">
   import { MarkdownEditor } from './markdown_editor.js';
   import { toggleTheme } from './codeBlockSyntax_java.js';
 
   new MarkdownEditor({
-    textarea: document.getElementById('editor'),
-    preview: document.getElementById('preview'),
+    textarea: document.querySelector('.editor'),
+    preview: document.querySelector('.preview'),
   });
 
   // オプション: テーマ切り替え
@@ -40,13 +40,13 @@ JavaScript で書かれたシンプルな Markdown エディタとプレビュ�
     <script type="module" src="/js/codeBlockSyntax_java.js"></script>
   </head>
   <body>
-    <textarea id="editor"></textarea>
-    <div id="preview"></div>
+    <textarea class="editor"></textarea>
+    <div class="preview"></div>
     <script type="module">
       import { MarkdownEditor } from '/js/markdown_editor.js';
       new MarkdownEditor({
-        textarea: document.getElementById('editor'),
-        preview: document.getElementById('preview'),
+        textarea: document.querySelector('.editor'),
+        preview: document.querySelector('.preview'),
       });
     </script>
   </body>

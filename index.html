@@ -13,10 +13,10 @@
         <button data-target="preview-pane">プレビュー</button>
       </div>
       <div id="editor-pane" class="pane active">
-        <textarea id="editor" placeholder="ここにMarkdownを入力"></textarea>
+        <textarea class="editor" placeholder="ここにMarkdownを入力"></textarea>
       </div>
       <div id="preview-pane" class="pane">
-        <div id="preview"></div>
+        <div class="preview"></div>
       </div>
     </div>
     <script type="module">
@@ -24,8 +24,8 @@
       import { toggleTheme } from './codeBlockSyntax_java.js';
 
       new MarkdownEditor({
-        textarea: document.getElementById('editor'),
-        preview: document.getElementById('preview'),
+        textarea: document.querySelector('.editor'),
+        preview: document.querySelector('.preview'),
         tabButtons: document.querySelectorAll('.tabs button'),
         panes: document.querySelectorAll('.pane'),
       });
