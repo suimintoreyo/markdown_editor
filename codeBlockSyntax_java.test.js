@@ -94,3 +94,15 @@ console.log('Class name expectation test passed.');
 output = tokenizeJava('List items;');
 assert(output.includes('<span class="tok tok-class">List</span>'));
 console.log('Uppercase heuristic test passed.');
+
+// Lowercase class names after keywords
+output = tokenizeJava('class a extends b implements c { void m() throws d { new e(); } }');
+assert(output.includes('<span class="tok tok-keyword">extends</span>'));
+assert(output.includes('<span class="tok tok-keyword">implements</span>'));
+assert(output.includes('<span class="tok tok-keyword">throws</span>'));
+assert(output.includes('<span class="tok tok-keyword">new</span>'));
+assert(output.includes('<span class="tok tok-class">b</span>'));
+assert(output.includes('<span class="tok tok-class">c</span>'));
+assert(output.includes('<span class="tok tok-class">d</span>'));
+assert(output.includes('<span class="tok tok-class">e</span>'));
+console.log('Lowercase contextual class name tokenization test passed.');
