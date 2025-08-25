@@ -18,7 +18,7 @@ export function registerLanguage(name, tokenizer) {
 }
 
 export function tokenizeJava(code) {
-  const keywordRe = /^(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|if|goto|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|record)\b/;
+  const keywordRe = /^(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|if|goto|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|record|var|yield|sealed|permits|non-sealed|module|open|requires|exports|opens|uses|provides|transitive)\b/;
   const numberRe = /^(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d[\d_]*)?)[lLfFdD]?/;
   const operatorRe = /^(?:==|!=|<=|>=|\+\+|--|&&|\|\||<<=|>>=|>>>|<<|>>|::|->|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[+\-*/%&|^!~<>=?:])/;
   const punctRe = /^[(){}\[\],.;]/;
