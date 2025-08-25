@@ -298,8 +298,8 @@ function processCodeBlocks(container) {
 class MarkdownEditor {
   constructor({ textarea, preview, tabButtons, panes } = {}) {
     if (typeof document === 'undefined') return;
-    this.editor = textarea || document.getElementById('editor');
-    this.preview = preview || document.getElementById('preview');
+    this.editor = textarea || document.querySelector('.editor');
+    this.preview = preview || document.querySelector('.preview');
     this.tabButtons = tabButtons
       ? Array.from(tabButtons)
       : Array.from(document.querySelectorAll('.tabs button'));
