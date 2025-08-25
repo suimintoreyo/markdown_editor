@@ -38,3 +38,22 @@ output = tokenizeJava('int x = 0xFF; double y = 3.14e10;');
 assert(output.includes('<span class="tok tok-number">0xFF</span>'));
 assert(output.includes('<span class="tok tok-number">3.14e10</span>'));
 console.log('Numeric literal tokenization test passed.');
+
+// Extended keyword set
+output = tokenizeJava(
+  'var x = 1; yield x; sealed interface S permits T {} non-sealed class N permits S {} open module M { requires transitive N; exports p; opens q; uses r; provides s with t; }'
+);
+assert(output.includes('<span class="tok tok-keyword">var</span>'));
+assert(output.includes('<span class="tok tok-keyword">yield</span>'));
+assert(output.includes('<span class="tok tok-keyword">sealed</span>'));
+assert(output.includes('<span class="tok tok-keyword">permits</span>'));
+assert(output.includes('<span class="tok tok-keyword">non-sealed</span>'));
+assert(output.includes('<span class="tok tok-keyword">module</span>'));
+assert(output.includes('<span class="tok tok-keyword">open</span>'));
+assert(output.includes('<span class="tok tok-keyword">requires</span>'));
+assert(output.includes('<span class="tok tok-keyword">exports</span>'));
+assert(output.includes('<span class="tok tok-keyword">opens</span>'));
+assert(output.includes('<span class="tok tok-keyword">uses</span>'));
+assert(output.includes('<span class="tok tok-keyword">provides</span>'));
+assert(output.includes('<span class="tok tok-keyword">transitive</span>'));
+console.log('Extended keyword tokenization test passed.');
