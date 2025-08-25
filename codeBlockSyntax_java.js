@@ -80,7 +80,9 @@ export function tokenizeJava(code) {
       const token = kw[0];
       html += wrap('keyword', token);
       i += token.length;
-      expectClassName = /^(?:class|interface|enum|record)$/.test(token);
+      expectClassName = /^(?:class|interface|enum|record|new|extends|implements|throws)$/.test(
+        token
+      );
       continue;
     }
     const lit = rest.match(literalRe);
@@ -96,7 +98,7 @@ export function tokenizeJava(code) {
       const ws = after.match(/^\s*/)[0];
       const next = after.slice(ws.length, ws.length + 1);
       let type = 'field';
-      if (expectClassName) {
+      if (expectClassName || /^[A-Z]/.test(name)) {
         type = 'class';
         expectClassName = false;
       } else if (next === '(') {

@@ -13,6 +13,12 @@ assert(output.includes('<span class="tok tok-keyword">void</span>'));
 assert(output.includes('<span class="tok tok-method">main</span>'));
 console.log('Basic Java tokenization test passed.');
 
+// System.out.println retains class/field/method tokens
+assert(output.includes('<span class="tok tok-class">System</span>'));
+assert(output.includes('<span class="tok tok-field">out</span>'));
+assert(output.includes('<span class="tok tok-method">println</span>'));
+console.log('System.out.println tokenization test passed.');
+
 // Annotation handling
 output = tokenizeJava(
   'class Hello { @Override public String toString() { return "Hi"; } }'
@@ -73,3 +79,18 @@ assert(output.includes('<span class="tok tok-keyword">uses</span>'));
 assert(output.includes('<span class="tok tok-keyword">provides</span>'));
 assert(output.includes('<span class="tok tok-keyword">transitive</span>'));
 console.log('Extended keyword tokenization test passed.');
+
+// Class name expectations after new/extends/implements/throws
+output = tokenizeJava(
+  'class A extends B implements C { void m() throws D { new E(); } }'
+);
+assert(output.includes('<span class="tok tok-class">B</span>'));
+assert(output.includes('<span class="tok tok-class">C</span>'));
+assert(output.includes('<span class="tok tok-class">D</span>'));
+assert(output.includes('<span class="tok tok-class">E</span>'));
+console.log('Class name expectation test passed.');
+
+// Uppercase heuristic for class names
+output = tokenizeJava('List items;');
+assert(output.includes('<span class="tok tok-class">List</span>'));
+console.log('Uppercase heuristic test passed.');
