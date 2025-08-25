@@ -5,6 +5,12 @@
   --num: #b5cea8;
   --com: #6a9955;
   --func: #dcdcaa;
+  --annot: #c8c8c8;
+  --class: #4ec9b0;
+  --method: #dcdcaa;
+  --field: #9cdcfe;
+  --op: #d4d4d4;
+  --punct: #d4d4d4;
   --line-num: #858585;
 }
 
@@ -61,6 +67,30 @@ pre code > .line::before {
   color: var(--func);
 }
 
+.tok-annotation {
+  color: var(--annot);
+}
+
+.tok-class {
+  color: var(--class);
+}
+
+.tok-method {
+  color: var(--method);
+}
+
+.tok-field {
+  color: var(--field);
+}
+
+.tok-operator {
+  color: var(--op);
+}
+
+.tok-punctuation {
+  color: var(--punct);
+}
+
 [data-theme="light"] {
   --code-txt: #333;
   --kw: #0000ff;
@@ -69,6 +99,12 @@ pre code > .line::before {
   --num: #098658;
   --com: #008000;
   --func: #795e26;
+  --annot: #267f99;
+  --class: #267f99;
+  --method: #795e26;
+  --field: #001080;
+  --op: #000;
+  --punct: #000;
   --line-num: #999;
 }
 
@@ -80,5 +116,11 @@ pre code > .line::before {
   --num: #ffff00;
   --com: #ffffff;
   --func: #00ff00;
+  --annot: #ff00ff;
+  --class: #a4ffff;
+  --method: #00ff00;
+  --field: #ffff00;
+  --op: #ffffff;
+  --punct: #ffffff;
   --line-num: #fff;
 }
