@@ -6,6 +6,8 @@ JavaScript で書かれたシンプルな Markdown エディタとプレビュ�
 
 本リポジトリの JS ファイルをコピーするだけでモジュールとして利用できます。依存関係はありません。
 
+エディタとプレビューの要素はそれぞれ `.editor` と `.preview` というクラス名で取得します。ID を使用しないため、必要であれば同一ページに複数のエディタを配置できます。
+
 ### 素の HTML での利用
 
 ```html
@@ -15,9 +17,12 @@ JavaScript で書かれたシンプルな Markdown エディタとプレビュ�
   import { MarkdownEditor } from './markdown_editor.js';
   import { toggleTheme } from './codeBlockSyntax_java.js';
 
+  const textarea = document.querySelector('.editor');
+  const preview = document.querySelector('.preview');
+
   new MarkdownEditor({
-    textarea: document.querySelector('.editor'),
-    preview: document.querySelector('.preview'),
+    textarea,
+    preview,
   });
 
   // オプション: テーマ切り替え
@@ -44,10 +49,9 @@ JavaScript で書かれたシンプルな Markdown エディタとプレビュ�
     <div class="preview"></div>
     <script type="module">
       import { MarkdownEditor } from '/js/markdown_editor.js';
-      new MarkdownEditor({
-        textarea: document.querySelector('.editor'),
-        preview: document.querySelector('.preview'),
-      });
+      const textarea = document.querySelector('.editor');
+      const preview = document.querySelector('.preview');
+      new MarkdownEditor({ textarea, preview });
     </script>
   </body>
 </html>
