@@ -39,6 +39,22 @@ assert(output.includes('<span class="tok tok-number">0xFF</span>'));
 assert(output.includes('<span class="tok tok-number">3.14e10</span>'));
 console.log('Numeric literal tokenization test passed.');
 
+// Text block string
+output = tokenizeJava('String s = """hello""";');
+assert(
+  output.includes(
+    '<span class="tok tok-string">&quot;&quot;&quot;hello&quot;&quot;&quot;</span>'
+  )
+);
+console.log('Text block string tokenization test passed.');
+
+// Boolean and null literals
+output = tokenizeJava('boolean a = true; boolean b = false; Object c = null;');
+assert(output.includes('<span class="tok tok-literal">true</span>'));
+assert(output.includes('<span class="tok tok-literal">false</span>'));
+assert(output.includes('<span class="tok tok-literal">null</span>'));
+console.log('Boolean and null literal tokenization test passed.');
+
 // Extended keyword set
 output = tokenizeJava(
   'var x = 1; yield x; sealed interface S permits T {} non-sealed class N permits S {} open module M { requires transitive N; exports p; opens q; uses r; provides s with t; }'
