@@ -8,9 +8,13 @@ const { document } = window;
 
 global.window = window;
 global.document = document;
-global.navigator = window.navigator;
+Object.defineProperty(globalThis, "navigator", {
+  value: window.navigator,
+  configurable: true,
+  writable: true
+});
 
-delete navigator.clipboard;
+delete globalThis.navigator.clipboard;
 
 document.body.innerHTML = parseMarkdown('```\ncode\n```');
 processCodeBlocks(document.body);
