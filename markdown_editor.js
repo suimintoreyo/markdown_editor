@@ -261,9 +261,18 @@ function parseMarkdown(markdown) {
     }
 
     let processed = sanitize(line).trimEnd();
-    processed = processed.replace(/(\*\*\*|___)(.+?)\1/g, '<strong><em>$2</em></strong>');
-    processed = processed.replace(/(\*\*|__)(.+?)\1/g, '<strong>$2</strong>');
-    processed = processed.replace(/(\*|_)(.+?)\1/g, '<em>$2</em>');
+    processed = processed.replace(
+      /(^|\W)(\*\*\*|___)(?=\S)(.+?)(?<=\S)\2(?=\W|$)/g,
+      '$1<strong><em>$3</em></strong>'
+    );
+    processed = processed.replace(
+      /(^|\W)(\*\*|__)(?=\S)(.+?)(?<=\S)\2(?=\W|$)/g,
+      '$1<strong>$3</strong>'
+    );
+    processed = processed.replace(
+      /(^|\W)(\*|_)(?=\S)(.+?)(?<=\S)\2(?=\W|$)/g,
+      '$1<em>$3</em>'
+    );
     processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
     processed = processed.replace(/!\[(.+?)\]\((.+?)\)/g, (m, alt, url) => `<img src="${url}" alt="${alt}" />`);
     processed = processed.replace(/\[(.+?)\]\((.+?)\)/g, (m, text, url) => `<a href="${url}">${text}</a>`);

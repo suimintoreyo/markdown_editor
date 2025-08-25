@@ -155,6 +155,11 @@ const emUnderscoreExpected = '<p><em>italic</em></p>';
 assert.strictEqual(parseMarkdown(emUnderscoreMd), emUnderscoreExpected);
 console.log('Underscore emphasis test passed.');
 
+const underscoreWordMd = 'hello_world';
+const underscoreWordExpected = '<p>hello_world</p>';
+assert.strictEqual(parseMarkdown(underscoreWordMd), underscoreWordExpected);
+console.log('Word with underscore should remain literal test passed.');
+
 const strongStarMd = '**bold**';
 const strongStarExpected = '<p><strong>bold</strong></p>';
 assert.strictEqual(parseMarkdown(strongStarMd), strongStarExpected);
