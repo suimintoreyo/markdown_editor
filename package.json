@@ -1,5 +1,7 @@
 {
   "type": "module",
+  "main": "./markdown_editor.js",
+  "exports": "./markdown_editor.js",
   "dependencies": {
     "jsdom": "^26.1.0"
   }
