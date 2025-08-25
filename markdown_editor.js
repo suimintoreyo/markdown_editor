@@ -1,11 +1,4 @@
-function sanitize(str) {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+import { sanitize } from './utils/sanitize.js';
 
 function parseTables(lines, index) {
   const line = lines[index];
