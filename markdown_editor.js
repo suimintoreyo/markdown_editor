@@ -45,6 +45,7 @@ function parseTables(lines, index) {
 
   while (i + 1 < lines.length && lines[i + 1].includes('|')) {
     const row = splitTableRow(lines[i + 1]);
+    if (row.length !== headers.length) return null;
     i++;
     tableHtml += '<tr>';
     row.forEach((cell, idx) => {

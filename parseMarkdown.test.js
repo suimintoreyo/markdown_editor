@@ -185,6 +185,11 @@ const tableExpected = '<table><thead><tr><th style="text-align:left">Name</th><t
 assert.strictEqual(parseMarkdown(tableMd), tableExpected);
 console.log('Table with header and alignment test passed.');
 
+const malformedTableMd = `| A | B |\n| - | - |\n| 1 | 2 | 3 |`;
+const malformedTableExpected = '<p>| A | B | | - | - | | 1 | 2 | 3 |</p>';
+assert.strictEqual(parseMarkdown(malformedTableMd), malformedTableExpected);
+console.log('Malformed table should not be parsed test passed.');
+
 const h1Md = '# Heading 1';
 const h1Expected = '<h1>Heading 1</h1>';
 assert.strictEqual(parseMarkdown(h1Md), h1Expected);
@@ -238,6 +243,10 @@ const tableExpectedPure =
   '<table><thead><tr><th>A</th></tr></thead><tbody><tr><td>B</td></tr></tbody></table>';
 assert.deepStrictEqual(tableRes, { html: tableExpectedPure, nextIndex: 2 });
 console.log('parseTables basic test passed.');
+
+const malformedTableLines = ['| A | B |', '| - | - |', '| 1 | 2 | 3 |'];
+assert.strictEqual(parseTables(malformedTableLines, 0), null);
+console.log('parseTables malformed table test passed.');
 
 const bqRes = parseBlockquotes('>> Quote', 0);
 assert.deepStrictEqual(bqRes, {
