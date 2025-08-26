@@ -13,6 +13,12 @@ assert(output.includes('<span class="tok tok-keyword">void</span>'));
 assert(output.includes('<span class="tok tok-method">main</span>'));
 console.log('Basic Java tokenization test passed.');
 
+// System.out.println retains class/field/method tokens
+assert(output.includes('<span class="tok tok-class">System</span>'));
+assert(output.includes('<span class="tok tok-field">out</span>'));
+assert(output.includes('<span class="tok tok-method">println</span>'));
+console.log('System.out.println tokenization test passed.');
+
 // Annotation handling
 output = tokenizeJava(
   'class Hello { @Override public String toString() { return "Hi"; } }'
@@ -38,3 +44,65 @@ output = tokenizeJava('int x = 0xFF; double y = 3.14e10;');
 assert(output.includes('<span class="tok tok-number">0xFF</span>'));
 assert(output.includes('<span class="tok tok-number">3.14e10</span>'));
 console.log('Numeric literal tokenization test passed.');
+
+// Text block string
+output = tokenizeJava('String s = """hello""";');
+assert(
+  output.includes(
+    '<span class="tok tok-string">&quot;&quot;&quot;hello&quot;&quot;&quot;</span>'
+  )
+);
+console.log('Text block string tokenization test passed.');
+
+// Boolean and null literals
+output = tokenizeJava('boolean a = true; boolean b = false; Object c = null;');
+assert(output.includes('<span class="tok tok-literal">true</span>'));
+assert(output.includes('<span class="tok tok-literal">false</span>'));
+assert(output.includes('<span class="tok tok-literal">null</span>'));
+console.log('Boolean and null literal tokenization test passed.');
+
+// Extended keyword set
+output = tokenizeJava(
+  'var x = 1; yield x; sealed interface S permits T {} non-sealed class N permits S {} open module M { requires transitive N; exports p; opens q; uses r; provides s with t; }'
+);
+assert(output.includes('<span class="tok tok-keyword">var</span>'));
+assert(output.includes('<span class="tok tok-keyword">yield</span>'));
+assert(output.includes('<span class="tok tok-keyword">sealed</span>'));
+assert(output.includes('<span class="tok tok-keyword">permits</span>'));
+assert(output.includes('<span class="tok tok-keyword">non-sealed</span>'));
+assert(output.includes('<span class="tok tok-keyword">module</span>'));
+assert(output.includes('<span class="tok tok-keyword">open</span>'));
+assert(output.includes('<span class="tok tok-keyword">requires</span>'));
+assert(output.includes('<span class="tok tok-keyword">exports</span>'));
+assert(output.includes('<span class="tok tok-keyword">opens</span>'));
+assert(output.includes('<span class="tok tok-keyword">uses</span>'));
+assert(output.includes('<span class="tok tok-keyword">provides</span>'));
+assert(output.includes('<span class="tok tok-keyword">transitive</span>'));
+console.log('Extended keyword tokenization test passed.');
+
+// Class name expectations after new/extends/implements/throws
+output = tokenizeJava(
+  'class A extends B implements C { void m() throws D { new E(); } }'
+);
+assert(output.includes('<span class="tok tok-class">B</span>'));
+assert(output.includes('<span class="tok tok-class">C</span>'));
+assert(output.includes('<span class="tok tok-class">D</span>'));
+assert(output.includes('<span class="tok tok-class">E</span>'));
+console.log('Class name expectation test passed.');
+
+// Uppercase heuristic for class names
+output = tokenizeJava('List items;');
+assert(output.includes('<span class="tok tok-class">List</span>'));
+console.log('Uppercase heuristic test passed.');
+
+// Lowercase class names after keywords
+output = tokenizeJava('class a extends b implements c { void m() throws d { new e(); } }');
+assert(output.includes('<span class="tok tok-keyword">extends</span>'));
+assert(output.includes('<span class="tok tok-keyword">implements</span>'));
+assert(output.includes('<span class="tok tok-keyword">throws</span>'));
+assert(output.includes('<span class="tok tok-keyword">new</span>'));
+assert(output.includes('<span class="tok tok-class">b</span>'));
+assert(output.includes('<span class="tok tok-class">c</span>'));
+assert(output.includes('<span class="tok tok-class">d</span>'));
+assert(output.includes('<span class="tok tok-class">e</span>'));
+console.log('Lowercase contextual class name tokenization test passed.');

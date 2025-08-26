@@ -9,28 +9,21 @@ const { document } = window;
 global.window = window;
 global.document = document;
 
+const editorInstance = new MarkdownEditor();
+
 const textarea = document.querySelector('.editor');
 const preview = document.querySelector('.preview');
 
-const editor = new MarkdownEditor({ textarea, preview });
-
 textarea.value = '# hello';
 textarea.dispatchEvent(new window.Event('input', { bubbles: true }));
+assert.strictEqual(preview.innerHTML.trim(), '<h1>hello</h1>');
+
 const initial = preview.innerHTML;
 
-editor.destroy();
+editorInstance.destroy();
 
 textarea.value = '# bye';
 textarea.dispatchEvent(new window.Event('input', { bubbles: true }));
 assert.strictEqual(preview.innerHTML, initial);
 
-textarea.value = 'test';
-textarea.dispatchEvent(
-  new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
-);
-assert.strictEqual(textarea.value, 'test');
-
-assert.strictEqual(editor.editor, null);
-assert.strictEqual(editor.preview, null);
-
-console.log('MarkdownEditor destroy test passed.');
+console.log('MarkdownEditor default class selection test passed.');

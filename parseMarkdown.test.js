@@ -38,6 +38,23 @@ const blockquoteExpected = '<blockquote><blockquote><blockquote>Nested quote</bl
 assert.strictEqual(parseMarkdown(blockquoteMd), blockquoteExpected);
 console.log('Nested blockquote parsing test passed.');
 
+const multiLineBlockquoteMd = `> line1\n> line2`;
+const multiLineBlockquoteExpected = '<blockquote>line1<br>line2</blockquote>';
+assert.strictEqual(
+  parseMarkdown(multiLineBlockquoteMd),
+  multiLineBlockquoteExpected
+);
+console.log('Multi-line blockquote parsing test passed.');
+
+const nestedMultiBlockquoteMd = `> outer\n>> inner1\n>> inner2\n> outer2`;
+const nestedMultiBlockquoteExpected =
+  '<blockquote>outer<br><blockquote>inner1<br>inner2</blockquote><br>outer2</blockquote>';
+assert.strictEqual(
+  parseMarkdown(nestedMultiBlockquoteMd),
+  nestedMultiBlockquoteExpected
+);
+console.log('Nested multi-line blockquote parsing test passed.');
+
 const hrDashMd = '---';
 const hrDashExpected = '<hr />';
 assert.strictEqual(parseMarkdown(hrDashMd), hrDashExpected);
@@ -138,6 +155,11 @@ const emUnderscoreExpected = '<p><em>italic</em></p>';
 assert.strictEqual(parseMarkdown(emUnderscoreMd), emUnderscoreExpected);
 console.log('Underscore emphasis test passed.');
 
+const underscoreWordMd = 'hello_world';
+const underscoreWordExpected = '<p>hello_world</p>';
+assert.strictEqual(parseMarkdown(underscoreWordMd), underscoreWordExpected);
+console.log('Word with underscore should remain literal test passed.');
+
 const strongStarMd = '**bold**';
 const strongStarExpected = '<p><strong>bold</strong></p>';
 assert.strictEqual(parseMarkdown(strongStarMd), strongStarExpected);
@@ -162,6 +184,11 @@ const tableMd = `| Name | Qty | Price |\n|:----|:---:|-----:|\n| Pen | 5 | 1.00 
 const tableExpected = '<table><thead><tr><th style="text-align:left">Name</th><th style="text-align:center">Qty</th><th style="text-align:right">Price</th></tr></thead><tbody><tr><td style="text-align:left">Pen</td><td style="text-align:center">5</td><td style="text-align:right">1.00</td></tr><tr><td style="text-align:left">Pencil</td><td style="text-align:center">2</td><td style="text-align:right">0.50</td></tr></tbody></table>';
 assert.strictEqual(parseMarkdown(tableMd), tableExpected);
 console.log('Table with header and alignment test passed.');
+
+const malformedTableMd = `| A | B |\n| - | - |\n| 1 | 2 | 3 |`;
+const malformedTableExpected = '<p>| A | B | | - | - | | 1 | 2 | 3 |</p>';
+assert.strictEqual(parseMarkdown(malformedTableMd), malformedTableExpected);
+console.log('Malformed table should not be parsed test passed.');
 
 const h1Md = '# Heading 1';
 const h1Expected = '<h1>Heading 1</h1>';
@@ -217,11 +244,15 @@ const tableExpectedPure =
 assert.deepStrictEqual(tableRes, { html: tableExpectedPure, nextIndex: 2 });
 console.log('parseTables basic test passed.');
 
-const bqRes = parseBlockquotes('>> Quote');
-assert.strictEqual(
-  bqRes.html,
-  '<blockquote><blockquote>Quote</blockquote></blockquote>'
-);
+const malformedTableLines = ['| A | B |', '| - | - |', '| 1 | 2 | 3 |'];
+assert.strictEqual(parseTables(malformedTableLines, 0), null);
+console.log('parseTables malformed table test passed.');
+
+const bqRes = parseBlockquotes('>> Quote', 0);
+assert.deepStrictEqual(bqRes, {
+  html: '<blockquote><blockquote>Quote',
+  depth: 2,
+});
 console.log('parseBlockquotes basic test passed.');
 
 import { tokenizeJava } from './codeBlockSyntax_java.js';

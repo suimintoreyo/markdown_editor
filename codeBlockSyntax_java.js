@@ -1,4 +1,4 @@
-import { sanitize } from './sanitize.js';
+import { sanitize } from './utils/sanitize.js';
 
 const languages = {};
 
@@ -11,7 +11,8 @@ export function registerLanguage(name, tokenizer) {
 }
 
 export function tokenizeJava(code) {
-  const keywordRe = /^(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|if|goto|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|record)\b/;
+  const keywordRe = /^(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|if|goto|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|record|var|yield|sealed|permits|non-sealed|module|open|requires|exports|opens|uses|provides|transitive)\b/;
+  const literalRe = /^(?:true|false|null)\b/;
   const numberRe = /^(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d[\d_]*)?)[lLfFdD]?/;
   const operatorRe = /^(?:==|!=|<=|>=|\+\+|--|&&|\|\||<<=|>>=|>>>|<<|>>|::|->|\+=|-=|\*=|\/=|%=|&=|\|=|\^=|[+\-*/%&|^!~<>=?:])/;
   const punctRe = /^[(){}\[\],.;]/;
@@ -31,6 +32,13 @@ export function tokenizeJava(code) {
       const end = rest.indexOf('*/', 2);
       const token = end === -1 ? rest : rest.slice(0, end + 2);
       html += wrap('comment', token);
+      i += token.length;
+      continue;
+    }
+    if (rest.startsWith('"""')) {
+      const end = rest.indexOf('"""', 3);
+      const token = end === -1 ? rest : rest.slice(0, end + 3);
+      html += wrap('string', token);
       i += token.length;
       continue;
     }
@@ -65,7 +73,15 @@ export function tokenizeJava(code) {
       const token = kw[0];
       html += wrap('keyword', token);
       i += token.length;
-      expectClassName = /^(?:class|interface|enum|record)$/.test(token);
+      expectClassName = /^(?:class|interface|enum|record|new|extends|implements|throws)$/.test(
+        token
+      );
+      continue;
+    }
+    const lit = rest.match(literalRe);
+    if (lit) {
+      html += wrap('literal', lit[0]);
+      i += lit[0].length;
       continue;
     }
     const ident = rest.match(/^[A-Za-z_]\w*/);
@@ -75,7 +91,7 @@ export function tokenizeJava(code) {
       const ws = after.match(/^\s*/)[0];
       const next = after.slice(ws.length, ws.length + 1);
       let type = 'field';
-      if (expectClassName) {
+      if (expectClassName || /^[A-Z]/.test(name)) {
         type = 'class';
         expectClassName = false;
       } else if (next === '(') {

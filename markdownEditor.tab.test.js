@@ -14,23 +14,15 @@ const preview = document.querySelector('.preview');
 
 const editor = new MarkdownEditor({ textarea, preview });
 
-textarea.value = '# hello';
-textarea.dispatchEvent(new window.Event('input', { bubbles: true }));
-const initial = preview.innerHTML;
-
-editor.destroy();
-
-textarea.value = '# bye';
-textarea.dispatchEvent(new window.Event('input', { bubbles: true }));
-assert.strictEqual(preview.innerHTML, initial);
-
 textarea.value = 'test';
+textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+
 textarea.dispatchEvent(
   new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
 );
-assert.strictEqual(textarea.value, 'test');
 
-assert.strictEqual(editor.editor, null);
-assert.strictEqual(editor.preview, null);
+assert.strictEqual(textarea.value, 'test    ');
 
-console.log('MarkdownEditor destroy test passed.');
+editor.destroy();
+
+console.log('MarkdownEditor Tab insertion test passed.');
