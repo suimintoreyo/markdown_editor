@@ -1,0 +1,26 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tabs button {
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background-color: #6c757d;
+  color: white;
+}
+
+.pane {
+  display: none;
+  margin-top: 1rem;
+}
+
+.pane.active {
+  display: block;
+}

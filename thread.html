@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>スレッド詳細</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="thread.css"/>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="card-title">JavaScriptの非同期処理について</h3>
+          <div class="mb-2">
+            <span class="badge bg-primary">Alice</span>
+            <span class="text-muted">2025-08-20</span>
+          </div>
+          <p class="card-text">
+            Promiseとasync/awaitの違いを詳しく教えてください。
+          </p>
+        </div>
+      </div>
+
+      <!-- タブは見た目だけ残す -->
+      <div class="tabs mt-4">
+        <button class="active btn btn-outline-secondary">回答</button>
+        <button class="btn btn-outline-secondary">コメント</button>
+      </div>
+
+      <!-- 回答タブ -->
+      <div id="answers-pane" class="pane active">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <strong>Bob:</strong> Promiseはコールバックの連鎖を避けるために使うオブジェクトです。
+            async/awaitはPromiseを同期処理のように書ける糖衣構文です。
+          </li>
+          <li class="list-group-item">
+            <strong>Charlie:</strong> 例を挙げると理解しやすいですよ。
+          </li>
+        </ul>
+        <div class="mt-3">
+          <h5>回答を投稿</h5>
+          <form>
+            <textarea
+              class="form-control"
+              rows="4"
+              placeholder="回答を入力してください"
+            ></textarea>
+            <button class="btn btn-primary mt-2" type="button">投稿</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- コメントタブ -->
+      <div id="comments-pane" class="pane">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <strong>Dave:</strong> 私も気になっていました！
+          </li>
+          <li class="list-group-item">
+            <strong>Eve:</strong> async/awaitはエラーハンドリングがtry-catchでできるのが便利です。
+          </li>
+        </ul>
+        <div class="mt-3">
+          <h5>コメントを投稿</h5>
+          <form>
+            <textarea
+              class="form-control"
+              rows="3"
+              placeholder="コメントを入力してください"
+            ></textarea>
+            <button class="btn btn-secondary mt-2" type="button">投稿</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
