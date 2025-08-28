@@ -47,17 +47,28 @@
         </ul>
         <div class="mt-3">
           <h5>回答を投稿</h5>
-          <div class="md-editor-set">
-            <form>
-              <textarea
-                class="form-control md-editor"
-                rows="4"
-                placeholder="回答を入力してください"
-              ></textarea>
-              <div class="md-preview"></div>
-              <button class="btn btn-primary mt-2" type="button">投稿</button>
-            </form>
-          </div>
+          <form>
+            <div class="md-editor-set">
+              <div class="tabs">
+                <button class="active btn btn-outline-secondary" data-target="answer-editor-pane">編集</button>
+                <button class="btn btn-outline-secondary" data-target="answer-preview-pane">プレビュー</button>
+              </div>
+              <div id="answer-editor-pane" class="pane active">
+                <textarea
+                  class="form-control md-editor"
+                  id="answer-editor"
+                  rows="4"
+                  placeholder="回答を入力してください"
+                ></textarea>
+              </div>
+              <div
+                id="answer-preview-pane"
+                class="pane md-preview"
+                data-md-for="answer-editor"
+              ></div>
+            </div>
+            <button class="btn btn-primary mt-2" type="button">投稿</button>
+          </form>
         </div>
       </div>
 
