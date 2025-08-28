@@ -19,8 +19,18 @@ function initTempPreviews(root = document) {
   const tempEls = root.querySelectorAll('.md-temp-preview');
   tempEls.forEach((el) => {
     if (el.dataset.mdTempDone) return; // 既に処理された要素をスキップする。
-    const md = el.textContent || '';
-    el.innerHTML = parseMarkdown(md);
+    const rawMd = el.textContent || '';
+    const lines = rawMd.split('\n');
+    const indent = lines.reduce((min, line) => {
+      if (!line.trim()) return min;
+      const match = line.match(/^\s*/)[0].length;
+      return Math.min(min, match);
+    }, Infinity);
+    const normalizedMd = lines
+      .map((line) => line.slice(indent === Infinity ? 0 : indent))
+      .join('\n')
+      .trim();
+    el.innerHTML = parseMarkdown(normalizedMd);
     el.dataset.mdTempDone = '1';
   });
 }
