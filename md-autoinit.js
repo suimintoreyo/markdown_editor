@@ -1,14 +1,14 @@
 // md-autoinit.js
-// Auto-initialization module for Markdown static previews and live editors.
-// Order of operations on page load:
-//   1. Convert all `.md-temp-preview` elements from Markdown to HTML once.
-//   2. Setup `.md-editor-set` blocks so that textarea inputs update `.md-preview`
-//      elements in real time (with 120ms debounce).
-// This ensures static previews are rendered before editor widgets start syncing.
+// Markdown の静的プレビューとライブエディタのための自動初期化モジュール。
+// ページ読み込み時の処理順序:
+//   1. `.md-temp-preview` 要素を Markdown から HTML に一度だけ変換する。
+//   2. `.md-editor-set` ブロックを設定し、テキストエリアの入力が
+//      `.md-preview` 要素をリアルタイム (120ms のデバウンス付き) で更新する。
+// これにより、エディタウィジェットが同期を開始する前に静的プレビューが描画される。
 
 import { parseMarkdown } from './markdown_editor.js';
 
-// Track initialized textareas to avoid duplicate event binding.
+// 初期化済みのテキストエリアを追跡し、イベントの重複バインドを避ける。
 const initializedEditors = new WeakMap();
 
 /**
@@ -18,7 +18,7 @@ const initializedEditors = new WeakMap();
 function initTempPreviews(root = document) {
   const tempEls = root.querySelectorAll('.md-temp-preview');
   tempEls.forEach((el) => {
-    if (el.dataset.mdTempDone) return; // Skip already processed elements.
+    if (el.dataset.mdTempDone) return; // 既に処理された要素をスキップする。
     const md = el.textContent || '';
     el.innerHTML = parseMarkdown(md);
     el.dataset.mdTempDone = '1';
@@ -32,10 +32,10 @@ function initTempPreviews(root = document) {
 function initEditorSet(root) {
   const textareas = root.querySelectorAll('textarea.md-editor');
   textareas.forEach((ta) => {
-    if (initializedEditors.has(ta)) return; // Prevent double initialization
+    if (initializedEditors.has(ta)) return; // 二重初期化を防ぐ
     initializedEditors.set(ta, true);
 
-    // Determine preview elements linked to this textarea.
+    // このテキストエリアにリンクされたプレビュー要素を特定する。
     const previews = Array.from(root.querySelectorAll('.md-preview')).filter((pv) => {
       const target = pv.dataset.mdFor;
       return !target || (ta.id && target === ta.id);
@@ -48,7 +48,7 @@ function initEditorSet(root) {
       });
     };
 
-    // Debounce input events (120ms)
+    // 入力イベントをデバウンスする (120ms)
     let timer;
     const onInput = () => {
       clearTimeout(timer);
@@ -56,9 +56,9 @@ function initEditorSet(root) {
     };
 
     ta.addEventListener('input', onInput);
-    render(); // Initial render
+    render(); // 初期描画
 
-    // Setup tab switching if not already done for this root
+    // このルートでまだ設定されていない場合、タブ切り替えを設定する
     if (!root.dataset.mdTabsBound) {
       const tabButtons = Array.from(root.querySelectorAll('.tabs button'));
       const panes = Array.from(root.querySelectorAll('.pane'));
@@ -91,22 +91,22 @@ function initEditorSet(root) {
  *   - Then wire up dynamic `.md-editor-set` editors.
  */
 function autoInit(root = document) {
-  // Step 1: static conversion
+  // 手順1: 静的変換
   initTempPreviews(root);
 
-  // Step 2: dynamic editor wiring
+  // 手順2: 動的エディタの配線
   const sets = root.querySelectorAll('#md-editor-set, .md-editor-set');
   sets.forEach((set) => initEditorSet(set));
 }
 
-// Auto-run on DOMContentLoaded or immediately if already loaded
+// DOMContentLoaded 時に自動実行、または既に読み込まれていれば即時実行
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => autoInit(), { once: true });
 } else {
   autoInit();
 }
 
-// Optional global exposure for manual invocation
+// 手動呼び出し用にオプションでグローバルに公開する
 if (typeof window !== 'undefined') {
   window.MdAutoInit = autoInit;
 }
