@@ -57,6 +57,30 @@ function initEditorSet(root) {
 
     ta.addEventListener('input', onInput);
     render(); // Initial render
+
+    // Setup tab switching if not already done for this root
+    if (!root.dataset.mdTabsBound) {
+      const tabButtons = Array.from(root.querySelectorAll('.tabs button'));
+      const panes = Array.from(root.querySelectorAll('.pane'));
+      const previewPane = previews[0] ? previews[0].closest('.pane') : null;
+
+      tabButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.dataset.target;
+          panes.forEach((pane) => {
+            pane.classList.toggle('active', pane.id === targetId);
+          });
+          tabButtons.forEach((b) => {
+            b.classList.toggle('active', b === btn);
+          });
+          if (previewPane && targetId === previewPane.id) {
+            render();
+          }
+        });
+      });
+
+      root.dataset.mdTabsBound = '1';
+    }
   });
 }
 
